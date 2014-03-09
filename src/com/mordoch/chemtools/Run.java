@@ -282,16 +282,17 @@ public class Run {
 
 				default:
 					println("I didn't think it was that hard to enter an option.");
-				}
-				// End conversions
+				} // End conversions
 				break;
 
 			default:
 				println("Good job, you didn't enter an option.");				
-			}
+			} // End main menu
+			
 			// Now ask if the user wants to start again
 			println("Exit? (Enter true or false)");
 			isExit = input.nextBoolean();
-		} input.close(); // Don't forget to close the input stream so there's no resource leak
-	}
-}
+		} // end loop 
+		input.close(); // Don't forget to close the input stream so there's no resource leak
+	} // end method
+} // end class
