@@ -1,33 +1,50 @@
+/* Copyright Ariel Mordoch 2014
+This file is part of Chemistry Tools.
+
+    Chemistry Tools is free software: you can redistribute it and/or modify
+    it under the terms of the Lesser GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Chemistry Tools is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    Lesser GNU General Public License for more details.
+
+    You should have received a copy of the Lesser GNU General Public License
+    along with Chemistry Tools.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package com.mordoch.chemtools;
 
 /**
  * This class is used as a conversions library for conversions applicable to chemistry.
  * <p> Conversion types are length, molar, mass, and volume. </p>
- * <em> All methods are static. </em>
+ * <em> All methods are static; this class is abstract. </em>
  * @author Ariel M
  * @version 1.0
  * @see Run
  * @since 1.0
  */
 
-public class Conversion { 
+public abstract class Conversion { 
 	
 	// Avogadro's number for use in molar calcs
-	private static double avosNum = Math.pow(6.0221413, 23);
+	private static final double avosNum = Math.pow(6.0221413, 23);
 	
 	/*
 	 * Molar conversions
 	 */
 	
 	/**
-	 * This converts from mass to the amount of mols.
+	 * Converts from mass to the amount of mols.
 	 * @param mass the mass of an element/formula
 	 * @param molarMass the molar mass of an element formula
 	 * @return mols of an element/formula
 	 * @since 1.0
 	 */
 	
-	public static double massToMolar (double mass, double molarMass) {
+	public static double massToMols (double mass, double molarMass) {
 		return mass / molarMass;
 	}
 	

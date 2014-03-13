@@ -1,3 +1,20 @@
+/* Copyright Ariel Mordoch 2014
+This file is part of Chemistry Tools.
+
+    Chemistry Tools is free software: you can redistribute it and/or modify
+    it under the terms of the Lesser GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Chemistry Tools is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    Lesser GNU General Public License for more details.
+
+    You should have received a copy of the Lesser GNU General Public License
+    along with Chemistry Tools.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package com.mordoch.chemtools;
 
 import java.util.Scanner;
@@ -21,7 +38,7 @@ public class Run {
 	}
 	
 	/**
-	 * This method does the bulk of the work, listing options in categories and finally executing an option.
+	 * The main method does the bulk of the work, listing options in categories and finally executing an option.
 	 * <p>In more detail:</p> 
 	 * First the program asks the user what he/she wants to do. Using a switch statement, 
 	 * the program lists the option from there. For example, the "Conversions" option has several 
@@ -251,7 +268,7 @@ public class Run {
 						double mass = input.nextDouble();
 						println("Enter the molar mass of an element/formula: ");
 						double molarMass = input.nextDouble();
-						println( Conversion.massToMolar(mass, molarMass) + " mols" );
+						println( Conversion.massToMols(mass, molarMass) + " mols" );
 						break;
 					
 					case 1:
