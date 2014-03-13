@@ -3,7 +3,7 @@
 Chemistry Tools is meant to be used as a command line program that contains conversions and analyses useful to chemistry.
 In future versions it will be possible to use the program as a library.
 
-Currently, all methods are static and both classes are abstract, as neither need or use object properties.
+Currently, most methods are static and two classes are abstract, as neither need or use object properties.
 This means you need not create any Conversion or Analysis objects when implementing the classes yourself, rather, simply access them like so:
 
 ```
