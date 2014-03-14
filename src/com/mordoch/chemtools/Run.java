@@ -45,7 +45,6 @@ public class Run {
 	 * submenus that again use switch statements to find what conversion category the user wanted
 	 * and what conversion they wanted. It then prints the result of the conversion to the console.
 	 * @param args
-	 * @version 1.0
 	 * @see Conversion
 	 * @since 1.0
 	 */

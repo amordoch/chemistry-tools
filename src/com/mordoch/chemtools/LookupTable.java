@@ -25,20 +25,34 @@ import java.util.HashMap;
 /**
  * This class is used to store information about elements.
  * @author Ariel Mordoch
- * @version 1.1
+ * @version 1.0.5
+ * @see Run
  * @since 1.0.3
  */
 
 public class LookupTable {
 
 	/**
-	 * Prints a list of all the tables contained in the class.
+	 * Assembles a List<<x>Object> object containing all the Map objects in this class.
+	 * It is recommended to avoid using this method as it is an inefficient way of referencing element data, however,
+	 * it exists for some case where it may be useful.
 	 * @since 1.0.3
 	 */
 
-	public void list() {
-		System.out.println("Lists in lookup table:");
+	public List<Object> data() {
+		// Create the list
+		List<Object> data = new ArrayList<Object>();
+		// Add the maps to the list
+		data.add( name() );
+		data.add( molarMass() );
+		data.add( atomicNumber() );
+		// Print a list of all the data in this class
+		System.out.println("Data in lookup table:");
 		System.out.println( molarMass().toString() );
+		System.out.println( atomicNumber().toString() );
+		System.out.println( name().toString() );
+		// Return the list
+		return data;
 	}
 
 	/**
