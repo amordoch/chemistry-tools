@@ -13,12 +13,11 @@ Conversion.method(args)
 Lastly, in the main class, I've added two shortcut methods, one for using System.out.println(), the other for printing "Enter and amount: " to the console.
 
 | Class Name | Class Use |
-| :--------: | :-------: |
+| ---------- | --------- |
 | Run | Main class |
 | Conversion | Conversions |
 | Analysis | Finding empirical formula, etc. |
 | LookupTable | Finding and using element data |
-| ---------- | --------- | 
 
 
 TODO:
