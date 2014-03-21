@@ -18,19 +18,112 @@ This file is part of Chemistry Tools.
 package com.mordoch.chemtools;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
+
 
 /**
- * This class is used to store information about elements.
+ * This class is used to store information about elements. 
+ * There are three instance variables that contain Map objects. Upon creation these instance variables are either
+ * filled with data or set to null by the constuctor.
  * @author Ariel Mordoch
- * @version 1.0.5
+ * @version 0.5
+ * @see LookupTable#LookupTable(int, int, int, int)
+ * @see LookupTable#LookupTable()
  * @see Run
- * @since 1.0.3
+ * @since 0.4
  */
 
 public class LookupTable {
+	// Create three Maps that hold element data. Empty until filled by the constructor
+	private Map<String, Double> molarMass = new HashMap<String, Double>(118, 1.01f);
+	private Map<String, Integer> atomicNumber = new HashMap<String, Integer>(118, 1.01f);
+	private Map<String, String> name = new HashMap<String, String>(118, 1.01f);
+
+	/**
+	 * This constructor decides what data is added to the lookup table on creation.
+	 * <ul>
+	 *     <body>
+	 *         <li> 1 - molar mass </li>
+	 *         <li> 2 - atomic number </li>
+	 *         <li> 3 - name </li>
+	 *     </body> 
+	 * </ul>
+	 * @param mapToFill the map to fill - can be 1, 2, or 3 
+	 * @param secondMapToFill the second map to fill - can be 1, 2, 3, or nothing
+	 * @param mapToNullify the map to nullify - can be 1, 2, or 3
+	 * @param secondMapToNullify - the second map to nullify - can be 1, 2, 3 or nothing
+	 */
+
+	public LookupTable(int mapToFill, int secondMapToFill, int mapToNullify, int secondMapToNullify) {
+		switch (mapToFill) {
+		    case 1:
+		        molarMass();		        
+		        break;
+		    case 2:
+		        atomicNumber();		        
+		        break;
+		    case 3:
+		        name();		        
+		        break;
+		    default:
+		        // nullify all
+		        molarMass = null;
+		        atomicNumber = null;
+		        name = null;
+		}
+		switch (secondMapToFill) {
+		    case 1:
+                molarMass();
+                break;
+            case 2:
+                atomicNumber();                
+                break;
+            case 3:
+                name();                
+                break;
+            default:
+                // nothing
+		}
+		switch (mapToNullify) {
+		    case 1:
+		        molarMass = null;
+		        break;
+		    case 2:
+		        atomicNumber = null;
+		        break;
+		    case 3:
+		        name = null;
+		        break;
+		    default:
+		        // do nothing
+		}
+		switch (secondMapToNullify) {
+		    case 1:
+		        molarMass = null;
+		        break;
+		    case 2:
+		        atomicNumber = null;
+		        break;
+		    case 3:
+		        name = null;
+		        break;
+		    default:
+		        // do nothing
+		}
+	}
+	
+	/**
+	 * If you want to fill all the Map objects with data, use this constructor.
+	 */
+	
+	public LookupTable() {
+	    molarMass();
+	    atomicNumber();
+	    name();
+	}
+
 
 	/**
 	 * Assembles a List<<x>Object> object containing all the Map objects in this class.
@@ -43,14 +136,9 @@ public class LookupTable {
 		// Create the list
 		List<Object> data = new ArrayList<Object>();
 		// Add the maps to the list
-		data.add( name() );
-		data.add( molarMass() );
-		data.add( atomicNumber() );
-		// Print a list of all the data in this class
-		System.out.println("Data in lookup table:");
-		System.out.println( molarMass().toString() );
-		System.out.println( atomicNumber().toString() );
-		System.out.println( name().toString() );
+		data.add( name );
+		data.add( molarMass );
+		data.add( atomicNumber );
 		// Return the list
 		return data;
 	}
@@ -66,22 +154,35 @@ public class LookupTable {
 	public List<String> getElementInfo(String element) {
 		// Create a new ArrayList that stores element info.
 		List<String> elementInfo = new ArrayList<String>();
-		// Print element info to console
-		System.out.println("Name: " + name().get(element) );
-		System.out.println("Atomic number: " + atomicNumber().get(element) );
-		System.out.println("Atomic mass: " + molarMass().get(element) + " amu" );
-		System.out.println("Molar mass: " + molarMass().get(element) + " g/mol" );
+		
 		/* Store element info */
+		
 		// Name
-		elementInfo.add( name().get(element) );
+		elementInfo.add( name.get(element) );
 		// Atomic number
-		elementInfo.add( Integer.toString( atomicNumber().get(element), 10 ) );
+		elementInfo.add( Integer.toString( atomicNumber.get(element), 10 ) );
 		// Atomic mass
-		elementInfo.add( Double.toString( molarMass().get(element) ) );
+		elementInfo.add( Double.toString( molarMass.get(element) ) );
 		// Molar mass
-		elementInfo.add( Double.toString( molarMass().get(element) ) );
+		elementInfo.add( Double.toString( molarMass.get(element) ) );
 		// Return the list
 		return elementInfo;
+	}
+	
+	public double getMolarMass(String element) {
+		return molarMass.get(element);
+	}
+
+	public int getAtomicNumber(String element) {
+		return atomicNumber.get(element);
+	}
+	
+	public double getAtomicMass(String element) {
+		return molarMass.get(element);
+	}
+	
+	public String getName(String element) {
+		return name.get(element);
 	}
 
 	/**
@@ -91,8 +192,7 @@ public class LookupTable {
 	 * @since 1.0.3
 	 */
 
-	public final Map<String, Double> molarMass() {
-		Map<String, Double> molarMass = new HashMap<String, Double>();
+	private final void molarMass() {
 		// Source: http://www.ptable.com
 		molarMass.put("H", 1.008);
 		molarMass.put("He", 4.002602);
@@ -213,8 +313,8 @@ public class LookupTable {
 		molarMass.put("Md", 258.);
 		molarMass.put("No", 259.);
 		molarMass.put("Lr", 262.);
-		return molarMass;
 	}
+
 
 	/**
 	 * Defines and returns a Map containing elements and their corresponding atomic numbers.
@@ -222,8 +322,7 @@ public class LookupTable {
 	 * @since 1.0.3
 	 */
 
-	public final Map<String, Integer> atomicNumber() {
-		Map<String, Integer> atomicNumber = new HashMap<String, Integer>();
+	private final void atomicNumber() {
 		atomicNumber.put("H",  1);
 		atomicNumber.put("He", 2);
 		atomicNumber.put("Li", 3);
@@ -343,7 +442,6 @@ public class LookupTable {
 		atomicNumber.put("Md", 101);
 		atomicNumber.put("No", 102);
 		atomicNumber.put("Lr", 103);
-		return atomicNumber;
 	}
 
 	/**
@@ -352,8 +450,7 @@ public class LookupTable {
 	 * @since 1.0.3
 	 */
 
-	public final Map<String, String> name() {
-		Map<String, String> name = new HashMap<String, String>();
+	private final void name() {
 		name.put("H",  "Hydrogen");
 		name.put("He", "Helium");
 		name.put("Li", "Lithuim");
@@ -473,6 +570,7 @@ public class LookupTable {
 		name.put("Md", "Mendelvium");
 		name.put("No", "Nobelium");
 		name.put("Lr", "Lawrenium");
-		return name;
 	}
+
 }
+

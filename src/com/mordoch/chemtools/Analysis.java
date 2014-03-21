@@ -20,16 +20,16 @@ package com.mordoch.chemtools;
 /**
  * This class contains tools for analysis, i.e. finding empirical formula given percent composition.
  * @author Ariel Mordoch
- * @version 1.0.3
+ * @version 0.5
  * @see Run
- * @since 1.0
+ * @since 0.1
  */
 
 public class Analysis {
 	
 	// Create a new lookup table for use in finding molar masses.
-	private LookupTable lookup = new LookupTable();
-	
+	private LookupTable lookup = new LookupTable(1, 0, 2, 3);
+
 	/**
 	 * <p><h1> Method has not been verified to work correctly.</h1></p>
 	 * This method takes 3 percents and 3 elements and finds the empirical formula for a compound containing those elements
@@ -48,9 +48,9 @@ public class Analysis {
 
 	public String empiricalFromPercentComposition (double percent1, double percent2, double percent3, String element1, String element2, String element3) {
 		// First find the mols of each element then find which one is smallest.
-		double element1Mols = percent1 / lookup.molarMass().get(element1);
-		double element2Mols = percent2 / lookup.molarMass().get(element2);
-		double element3Mols = percent3 / lookup.molarMass().get(element3);
+		double element1Mols = percent1 / lookup.getMolarMass(element1);
+		double element2Mols = percent2 / lookup.getMolarMass(element2);
+		double element3Mols = percent3 / lookup.getMolarMass(element3);
 		double normalize = Math.min(element1Mols, Math.min(element2Mols, element3Mols) );
 		// Now normalize the formula.
 		double element1Normal = element1Mols / normalize;
@@ -76,8 +76,8 @@ public class Analysis {
 
 	public String empiricalFromPercentComposition (double percent1, double percent2, String element1, String element2) {
 		// First find the mols of each element then find which one is smallest.
-		double element1Mols = percent1 / lookup.molarMass().get(element1);
-		double element2Mols = percent2 / lookup.molarMass().get(element2);
+		double element1Mols = percent1 / lookup.getMolarMass(element1);
+		double element2Mols = percent2 / lookup.getMolarMass(element2);
 		double normalize = Math.min(element1Mols, element2Mols);
 		// Now normalize the formula.
 		double element1Normal = element1Mols / normalize;
@@ -105,10 +105,10 @@ public class Analysis {
 
 	public String empiricalFromMass (double mass1, double mass2, double mass3, String element1, String element2, String element3) {
 		// First find the percent composition
-		double element1Percent = mass1 / lookup.molarMass().get(element1);
-		double element2Percent = mass2 / lookup.molarMass().get(element2);
-		double element3Percent = mass3 / lookup.molarMass().get(element3);
-		// Now find empirical formula (there's already a method for this, so why not?).
+		double element1Percent = mass1 / lookup.getMolarMass(element1);
+		double element2Percent = mass2 / lookup.getMolarMass(element2);
+		double element3Percent = mass3 / lookup.getMolarMass(element3);
+		// Now find empirical formula (there's already a method for this, so why not use it?).
 		return empiricalFromPercentComposition(element1Percent, element2Percent, element3Percent, element1, element2, element3);
 	}
 
@@ -129,8 +129,8 @@ public class Analysis {
 
 	public String empiricalFromMass (double mass1, double mass2, String element1, String element2) {
 		// First find the percent composition
-		double element1Percent = mass1 / lookup.molarMass().get(element1);
-		double element2Percent = mass2 / lookup.molarMass().get(element2);
+		double element1Percent = mass1 / lookup.getMolarMass(element1);
+		double element2Percent = mass2 / lookup.getMolarMass(element2);
 		// Now find empirical formula
 		return empiricalFromPercentComposition(element1Percent, element2Percent, element1, element2);
 	}
@@ -154,11 +154,11 @@ public class Analysis {
 		// Create an array of ints to store the correct, rounded subscripts
 		int[] roundedSubscripts = new int[3];
 		// Loop through the original subscripts
-		for (int x : subscripts) {
+		for (int index = 0; index < subscripts.length - 1; index++) {
 			// Multiply the subscript by the multiplier and store it in newSubscripts
-			newSubscripts[x] = subscripts[x] * multiplier;
+			newSubscripts[index] = subscripts[index] * multiplier;
 			// Round that off so it's proper
-			roundedSubscripts[x] = (int) Math.round( newSubscripts[x] );
+			roundedSubscripts[index] = (int) Math.round( newSubscripts[index] );
 		}
 		// Return the array
 		return roundedSubscripts;

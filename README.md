@@ -1,4 +1,4 @@
-###### Chemistry Tools Copyright 2014 Ariel Mordoch
+###### Chemistry Tools Copyright © 2014 Ariel Mordoch
 
 Chemistry Tools is meant to be used as a command line program that contains conversions and analyses useful to chemistry.
 In future versions it will be possible to use the program as a library.
