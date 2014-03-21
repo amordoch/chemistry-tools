@@ -573,4 +573,3 @@ public class LookupTable {
 	}
 
 }
-
