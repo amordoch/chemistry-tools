@@ -17,6 +17,7 @@ This file is part of Chemistry Tools.
 
 package com.mordoch.chemtools;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.awt.print.PrinterIOException;
 import java.util.Scanner;
@@ -55,7 +56,7 @@ public class Run {
      * and what conversion they wanted. It then prints the result of the conversion to the console.
      * @param args
      * @see Conversion
-     * @since 1.0
+     * @since 0.1
      */
 
     public static void main (String[] args) throws PrinterIOException {
@@ -70,7 +71,7 @@ public class Run {
         programInfo();
         // Loop so the user can start over once finished
         while (continueLooping) {
-            
+
             // Tell the user his/her options and get input
             println("Choose an option:");
             println("0: Conversions");
@@ -81,6 +82,7 @@ public class Run {
 
                 case 0:
                     // If he entered conversions, show conversions category
+                    System.out.println();
                     println("Choose an option: ");
                     println("0: Length conversions");
                     println("1: Mass conversions");
@@ -90,7 +92,8 @@ public class Run {
                     switch ( input.nextInt() ) {
                         // Length conversions follow
                         case 0:
-
+                            
+                            System.out.println();
                             println("Choose a conversion:");
                             println("0: Centimeters to meters");
                             println("1: Meters to centimeters");
@@ -166,7 +169,8 @@ public class Run {
                             break;
                             // Mass conversions follow	
                         case 1:
-
+                            
+                            System.out.println();
                             println("Choose a conversion: ");
                             println("0: Grams to milligrams");
                             println("1: Milligrams to grams");
@@ -225,7 +229,8 @@ public class Run {
                             break;
                             // Volume conversions follow
                         case 2:
-
+                            
+                            System.out.println();
                             println("Choose a conversion: ");
                             println("0: Liters to milliliters");
                             println("1: Milliliters to liters");
@@ -270,7 +275,8 @@ public class Run {
                             break;
                             // Molar conversions follow	
                         case 3: 
-
+                            
+                            System.out.println();
                             println("Choose a conversion:");
                             println("0: Grams to mols");
                             println("1: Mols to grams");
@@ -320,7 +326,8 @@ public class Run {
                     break;
 
                 case 1:
-
+                    
+                    System.out.println();
                     println("Choose an option:");
                     println("0: Empirical formula using percent composition");
                     println("1: Empirical formula using mass composition");
@@ -357,7 +364,7 @@ public class Run {
                                     double percentOne = input.nextDouble();
                                     println("Enter a percentage for element 2: ");
                                     double percentTwo = input.nextDouble();
-                                    println("Enter a percentage for element 3: ");
+                                    println("Etner a percentage for element 3: ");
                                     double percentThree = input.nextDouble();
                                     println( analysis.empiricalFromPercentComposition(percentOne, percentTwo, percentThree, elementOne, elementTwo, elementThree) );
                                     break;
@@ -397,7 +404,7 @@ public class Run {
                                     double massOne = input.nextDouble();
                                     println("Enter a percentage for element 2: ");
                                     double massTwo = input.nextDouble();
-                                    println("Etner a percentage for element 3: ");
+                                    println("Enter a percentage for element 3: ");
                                     double massThree = input.nextDouble();
                                     println( analysis.empiricalFromMass(massOne, massTwo, massThree, elementOne, elementTwo, elementThree) );
                                     break;
@@ -425,20 +432,43 @@ public class Run {
                             println("You didn't enter an option.");
                     } // End Analysis
                     break;
-                    
+
                 case 2:
                     
+                    System.out.println();
                     println("Enter an element:");
                     String element = input.next();
-                    List<String> elementInfo = lookup.getElementInfo(element);
-                    println("Name: " + elementInfo.get(0) );
-                    println("Atomic number: " + elementInfo.get(1) );
-                    println("Atomic mass: " + elementInfo.get(3) + " amu" );
-                    println("Molar mass: " + elementInfo.get(2) + " g/mol");                   
+                    // New List to store element info. ArrayList constructor is only there to satisfy the compiler
+                    List<String> elementInfo = new ArrayList<String>();
+                    // Start looping
+                    boolean inputIsInvalid = true;
+                    while(inputIsInvalid) {
+                        try {
+                            // Now try getting element info
+                            elementInfo = lookup.getElementInfo(element);
+                            
+                        } catch (NullPointerException e) {
+                            // If user entered a non-existent element, try again and get element info. If the user enters
+                            // a nonexistent element again it will throw a IndexOutOfBounds exception.
+                            println("Enter a real element this time:");
+                            String anotherElement = input.next();
+                            elementInfo = lookup.getElementInfo(anotherElement);
+                            
+                        } finally {
+                            // Finally, print element info
+                            println("Name: " + elementInfo.get(0) );
+                            println("Atomic number: " + elementInfo.get(1) );
+                            println("Atomic mass: " + elementInfo.get(3) + " amu" );
+                            println("Molar mass: " + elementInfo.get(2) + " g/mol");
+                            // Stop looping
+                            inputIsInvalid = false;
+                        }
+                    }
+
                     break;
-                
+
                 case 42:
-                    
+
                     println("Working...");
                     println("..........");
                     println("..........");

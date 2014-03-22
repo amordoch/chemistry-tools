@@ -43,7 +43,7 @@ public class Analysis {
 	 * @param element2 the symbol, i.e. "H", of the element corresponding to percent2
 	 * @param element3 the symbol, i.e. "H", of the element corresponding to percent3
 	 * @return Empirical formula <b>without correction for decimal subscripts</b>.
-	 * @since 1.0
+	 * @since 0.1
 	 */
 
 	public String empiricalFromPercentComposition (double percent1, double percent2, double percent3, String element1, String element2, String element3) {
@@ -71,7 +71,7 @@ public class Analysis {
 	 * @param element1 the symbol, i.e. "H", of the element corresponding to percent1
 	 * @param element2 the symbol, i.e. "H", of the element corresponding to percent2
 	 * @return Empirical formula <b>without correction for decimal subscripts</b>.
-	 * @since 1.0.1
+	 * @since 0.2
 	 */
 
 	public String empiricalFromPercentComposition (double percent1, double percent2, String element1, String element2) {
@@ -100,7 +100,7 @@ public class Analysis {
 	 * @param element3 the element that corresponds to mass3
 	 * @return empirical formula, <b>without correcting for decimal subscripts</b>
 	 * @see Analysis#empiricalFromPercentComposition(double, double, double, String, String, String)
-	 * @since 1.0.1
+	 * @since 0.2
 	 */
 
 	public String empiricalFromMass (double mass1, double mass2, double mass3, String element1, String element2, String element3) {
@@ -124,7 +124,7 @@ public class Analysis {
 	 * @param element2 the element that corresponds to mass2
 	 * @return empirical formula, <b>without correcting for decimal subscripts</b>
 	 * @see Analysis#empiricalFromPercentComposition(double, double, String, String)
-	 * @since 1.0.1
+	 * @since 0.2
 	 */
 
 	public String empiricalFromMass (double mass1, double mass2, String element1, String element2) {
@@ -143,7 +143,7 @@ public class Analysis {
 	 * @param molarMassEmpirical the molar mass of a compound's empirical formula
 	 * @param subscripts an array containing the empirical formula subscripts
 	 * @return an array containing the molecular formula's subscripts
-	 * @since 1.0.2
+	 * @since 0.3
 	 */
 	
 	public final int[] molecularFromEmpirical (double molarMassCompound, double molarMassEmpirical, int[] subscripts) {

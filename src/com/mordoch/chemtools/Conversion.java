@@ -135,6 +135,6 @@ public abstract class Conversion {
 	}
 	
 	public static double kilolitersToLiters (double kiloliters) {
-		return kiloliters / 1000;
+		return kiloliters * 1000;
 	}
 }
