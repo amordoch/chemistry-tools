@@ -154,7 +154,7 @@ public class Analysis {
 		// Create an array of ints to store the correct, rounded subscripts
 		int[] roundedSubscripts = new int[3];
 		// Loop through the original subscripts
-		for (int index = 0; index < subscripts.length - 1; index++) {
+		for (int index = 0; index < subscripts.length; index++) {
 			// Multiply the subscript by the multiplier and store it in newSubscripts
 			newSubscripts[index] = subscripts[index] * multiplier;
 			// Round that off so it's proper

@@ -357,7 +357,7 @@ public class Run {
                                     double percentOne = input.nextDouble();
                                     println("Enter a percentage for element 2: ");
                                     double percentTwo = input.nextDouble();
-                                    println("Etner a percentage for element 3: ");
+                                    println("Enter a percentage for element 3: ");
                                     double percentThree = input.nextDouble();
                                     println( analysis.empiricalFromPercentComposition(percentOne, percentTwo, percentThree, elementOne, elementTwo, elementThree) );
                                     break;
