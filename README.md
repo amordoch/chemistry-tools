@@ -10,14 +10,21 @@ This means you need not create any Conversion objects when implementing the clas
 Conversion.method(args)
 ```
 
-Lastly, in the main class, I've added two shortcut methods, one for using System.out.println(), the other for printing "Enter and amount: " to the console.
+Package Summary
+| Package Name | Description |
+| ------------ | ----------- |
+| com.mordoch.chemtools | Main package |
+| com.mordoch.chemtools.interaction | Human-interface package |
+| com.mordoch.chemtools.util | Utility classes |
 
+Class Summary
 | Class Name | Class Use |
 | ---------- | --------- |
-| Run | Main class |
+| Main | Main class |
 | Conversion | Conversions |
 | Analysis | Finding empirical formula, etc. |
 | LookupTable | Finding and using element data |
+| Menu | Command-line interface |
 
 
 TODO:

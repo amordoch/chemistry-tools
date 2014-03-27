@@ -15,7 +15,9 @@ This file is part of Chemistry Tools.
     along with Chemistry Tools.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.mordoch.chemtools;
+package com.mordoch.chemtools.util;
+
+import com.mordoch.chemtools.Main;
 
 /**
  * This class is used as a conversions library for conversions applicable to chemistry.
@@ -23,14 +25,14 @@ package com.mordoch.chemtools;
  * <em> All methods are static; this class is abstract. </em>
  * @author Ariel M
  * @version 1.0
- * @see Run
+ * @see Main
  * @since 0.1
  */
 
 public abstract class Conversion { 
 	
 	// Avogadro's number for use in molar calcs
-	private static final double avosNum = Math.pow(6.0221413, 23);
+	private static final double AVOGADROS_NUMBER = Math.pow(6.0221413, 23);
 	
 	/*
 	 * Molar conversions
@@ -45,11 +47,11 @@ public abstract class Conversion {
 	}
 	
 	public static double molsToAtomCount (double mols) {
-		return mols * avosNum;
+		return mols * AVOGADROS_NUMBER;
 	}
 	
 	public static double atomCountToMols (double atomCount) {
-		return atomCount / avosNum;
+		return atomCount / AVOGADROS_NUMBER;
 	}
 	
 	/*

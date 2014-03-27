@@ -15,12 +15,14 @@ This file is part of Chemistry Tools.
     along with Chemistry Tools.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.mordoch.chemtools;
+package com.mordoch.chemtools.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.mordoch.chemtools.Main;
 
 
 /**
@@ -29,9 +31,9 @@ import java.util.Map;
  * filled with data or set to null by the constuctor.
  * @author Ariel Mordoch
  * @version 0.5
- * @see LookupTable#LookupTable(int, int, int, int)
+ * @see LookupTable#LookupTable(String)
  * @see LookupTable#LookupTable()
- * @see Run
+ * @see Main
  * @since 0.4
  */
 
@@ -42,76 +44,38 @@ public class LookupTable {
     private Map<String, String> name = new HashMap<String, String>(118, 1.01f);
 
     /**
-     * This constructor decides what data is added to the lookup table on creation.
+     * This constructor fills the map corresponding to the desiredMap argument.
+     * <p>Possible arguments:</p>
      * <ul>
      *     <body>
-     *         <li> 1 - molar mass </li>
-     *         <li> 2 - atomic number </li>
-     *         <li> 3 - name </li>
-     *     </body> 
+     *         <li>molarMass</li>
+     *         <li>atomicNumber</li>
+     *         <li>name</li>
+     *     </body>
      * </ul>
-     * @param mapToFill the map to fill - can be 1, 2, or 3 
-     * @param secondMapToFill the second map to fill - can be 1, 2, 3, or nothing
-     * @param mapToNullify the map to nullify - can be 1, 2, or 3
-     * @param secondMapToNullify - the second map to nullify - can be 1, 2, 3 or nothing
+     * @param desiredMap a String corresponding to the map to populate with data
      */
 
-    public LookupTable(int mapToFill, int secondMapToFill, int mapToNullify, int secondMapToNullify) {
-        switch (mapToFill) {
-            case 1:
-                molarMass();		        
-                break;
-            case 2:
-                atomicNumber();		        
-                break;
-            case 3:
-                name();		        
-                break;
-            default:
-                // nullify all
-                molarMass = null;
-                atomicNumber = null;
-                name = null;
-        }
-        switch (secondMapToFill) {
-            case 1:
+    public LookupTable(String desiredMap) {
+        
+        switch(desiredMap) {
+            
+            case "molarMass":
                 molarMass();
                 break;
-            case 2:
-                atomicNumber();                
+            case "atomicNumber":
+                atomicNumber();
                 break;
-            case 3:
-                name();                
-                break;
-            default:
-                // nothing
-        }
-        switch (mapToNullify) {
-            case 1:
-                molarMass = null;
-                break;
-            case 2:
-                atomicNumber = null;
-                break;
-            case 3:
-                name = null;
+            case "name":
+                name();
                 break;
             default:
-                // do nothing
+                molarMass();
+                atomicNumber();
+                name();
+            
         }
-        switch (secondMapToNullify) {
-            case 1:
-                molarMass = null;
-                break;
-            case 2:
-                atomicNumber = null;
-                break;
-            case 3:
-                name = null;
-                break;
-            default:
-                // do nothing
-        }
+        
     }
 
     /**
@@ -129,7 +93,7 @@ public class LookupTable {
      * Assembles a List<<x>Object> object containing all the Map objects in this class.
      * It is recommended to avoid using this method as it is an inefficient way of referencing element data, however,
      * it exists for some case where it may be useful.
-     * @since 1.0.3
+     * @since 0.1
      */
 
     public List<Object> data() {
@@ -148,7 +112,7 @@ public class LookupTable {
      * <p> Format: name, atomic number, atomic mass, molar mass </p> 
      * @param element a string containing the symbol for an element.
      * @return A List<<x>String> containing information about an element. See format above.
-     * @since 1.0.3
+     * @since 0.1
      */
 
     public List<String> getElementInfo(String element) {
@@ -189,7 +153,7 @@ public class LookupTable {
      * Defines and returns a Map<<x>String, Double> containing the atomic/molar masses of every element on the periodic table.
      * Each element was added in order for the sake of convenience.
      * @return A Map<<x>String, Double> where the key is the atomic symbol, and the value is the atomic/molar mass. 
-     * @since 1.0.3
+     * @since 0.1
      */
 
     private final void molarMass() {
@@ -319,7 +283,7 @@ public class LookupTable {
     /**
      * Defines and returns a Map containing elements and their corresponding atomic numbers.
      * @return A Map containing elements and their atomic numbers.
-     * @since 1.0.3
+     * @since 0.1
      */
 
     private final void atomicNumber() {
@@ -447,7 +411,7 @@ public class LookupTable {
     /**
      * Defines and returns a Map containing elements and their corresponding names.
      * @return A Map containing elements and their names.
-     * @since 1.0.3
+     * @since 0.1
      */
 
     private final void name() {

@@ -17,18 +17,20 @@ This file is part of Chemistry Tools.
 
 package com.mordoch.chemtools;
 
+import com.mordoch.chemtools.util.LookupTable;
+
 /**
  * This class contains tools for analysis, i.e. finding empirical formula given percent composition.
  * @author Ariel Mordoch
  * @version 0.5
- * @see Run
+ * @see Main
  * @since 0.1
  */
 
 public class Analysis {
 	
 	// Create a new lookup table for use in finding molar masses.
-	private LookupTable lookup = new LookupTable(1, 0, 2, 3);
+	private LookupTable lookup = new LookupTable("molarMass");
 
 	/**
 	 * <p><h1> Method has not been verified to work correctly.</h1></p>
@@ -42,7 +44,7 @@ public class Analysis {
 	 * @param element1 the symbol, i.e. "H", of the element corresponding to percent1
 	 * @param element2 the symbol, i.e. "H", of the element corresponding to percent2
 	 * @param element3 the symbol, i.e. "H", of the element corresponding to percent3
-	 * @return Empirical formula <b>without correction for decimal subscripts</b>.
+	 * @return empirical formula <b>without correction for decimal subscripts</b>.
 	 * @since 0.1
 	 */
 
@@ -70,7 +72,7 @@ public class Analysis {
 	 * @param percent2 the percent of a second element in compound X
 	 * @param element1 the symbol, i.e. "H", of the element corresponding to percent1
 	 * @param element2 the symbol, i.e. "H", of the element corresponding to percent2
-	 * @return Empirical formula <b>without correction for decimal subscripts</b>.
+	 * @return empirical formula <b>without correction for decimal subscripts</b>.
 	 * @since 0.2
 	 */
 
