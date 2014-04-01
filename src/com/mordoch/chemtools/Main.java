@@ -1,5 +1,6 @@
 /*
- * Copyright Ariel Mordoch 2014 This file is part of Chemistry Tools.
+ * Copyright Ariel Mordoch 2014 
+ * This file is part of Chemistry Tools.
  * 
  * Chemistry Tools is free software: you can redistribute it and/or modify it under the terms of the
  * Lesser GNU General Public License as published by the Free Software Foundation, either version 3
@@ -27,7 +28,7 @@ import com.mordoch.chemtools.interaction.Menu;
 
 public class Main {
 
-  public static final String PROGRAM_VERSION = "0.6.5-alpha";
+  public static final String PROGRAM_VERSION = "0.6.8-alpha";
 
   /**
    * The main method prints out copyright information then instantiates Menu and calls mainMenu();

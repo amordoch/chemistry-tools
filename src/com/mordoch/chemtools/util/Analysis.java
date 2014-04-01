@@ -1,5 +1,6 @@
 /*
- * Copyright Ariel Mordoch 2014 This file is part of Chemistry Tools.
+ * Copyright Ariel Mordoch 2014 
+ * This file is part of Chemistry Tools.
  * 
  * Chemistry Tools is free software: you can redistribute it and/or modify it under the terms of the
  * Lesser GNU General Public License as published by the Free Software Foundation, either version 3
@@ -19,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mordoch.chemtools.Main;
+import com.mordoch.chemtools.formulatools.Formula;
+import com.mordoch.chemtools.formulatools.FormulaHelper;
 
 /**
  * This class contains tools for analysis, i.e. finding empirical formula given percent composition.
@@ -31,11 +34,14 @@ import com.mordoch.chemtools.Main;
 
 public class Analysis {
 
-  // Create a new lookup table for use in finding molar masses.
-  private LookupTable lookup = new LookupTable(1);
-  // Create a Parser for parsing formulae
-  private Parser parse = new Parser();
-
+  private LookupTable lookup;
+  private FormulaHelper formulaParser;
+  
+  public Analysis(LookupTable aLookupTable, FormulaHelper aFormulaHelper) {
+    this.lookup = aLookupTable;
+    this.formulaParser = aFormulaHelper;
+  }
+  
   /**
    * This method takes 3 percents and 3 elements and finds the empirical formula for a compound
    * containing those elements (the molar masses of each element are found automatically. The user
@@ -171,11 +177,12 @@ public class Analysis {
    * @since 0.3
    */
 
-  public final List<Integer> molecularFromEmpirical(String empiricalFormula,
+  public final String molecularFromEmpirical(String empiricalFormula,
       double molarMassCompound) {
+    Formula parsedFormula = formulaParser.parseFormula(empiricalFormula);
     // Get the molar mass and subscripts of the empirical formula
     double molarMassEmpirical = computeMolarMass(empiricalFormula);
-    List<Integer> subscripts = parse.getSubscripts(empiricalFormula);
+    List<Integer> subscripts = parsedFormula.getSubscripts();
     // First, find the factor of the molecular formula
     double multiplier = molarMassCompound / molarMassEmpirical;
     // Create a new ArrayList of doubles to store the multiplied subscripts
@@ -189,11 +196,20 @@ public class Analysis {
       // Round that off so it's proper
       roundedSubscripts.add((int) Math.round(newSubscripts.get(index)));
     }
-    // Discard newSubscripts and subscripts
+    List<String> elements = parsedFormula.getElements();
+    // Construct the molecular formula
+    String molecularFormula = "";
+    int indexOfSubscripts = 0;
+    for (String element : elements ) {
+      molecularFormula += element + roundedSubscripts.get(indexOfSubscripts);
+      indexOfSubscripts++;
+    }
+    // Discard objects and return
     newSubscripts = null;
     subscripts = null;
-    // Return the list
-    return roundedSubscripts;
+    roundedSubscripts = null;
+    parsedFormula = null;
+    return molecularFormula;
   }
 
   public double[] computePercentComposition(String formula) {
@@ -212,21 +228,27 @@ public class Analysis {
    */
 
   public double computeMolarMass(String formula) {
+    Formula parsedFormula = formulaParser.parseFormula(formula);
     // First get the subscripts, elements, and coefficients from the forumula and declare a variable
     // that stores molar mass.
-    List<Integer> subscripts = parse.getSubscripts(formula);
-    List<String> elements = parse.getElements(formula);
-    List<Double> coefficients = parse.getCoefficients(formula);
+    List<Integer> subscripts = parsedFormula.getSubscripts();
+    List<String> elements = parsedFormula.getElements();
+    List<Double> coefficients = parsedFormula.getCoefficients();
     double molarMass = 0;
     // Now loop through the elements. Each iteration, multiply the subscript by the molar mass of
     // the element and its coefficient and add to molarMass.
     // Note that the given formula must be syntactically compatible with
-    // Parser#parseSimpleFormula().
+    // Parser#parseFormula().
     for (int index = 0; index < elements.size(); index++) {
       molarMass +=
           subscripts.get(index) * lookup.getMolarMass(elements.get(index))
               * coefficients.get(index);
     }
+    // Now discard all the objects and return.
+    parsedFormula = null;
+    subscripts = null;
+    elements = null;
+    coefficients = null;
     return molarMass;
   }
 
@@ -252,11 +274,11 @@ public class Analysis {
    * @return the number of atoms in the formula
    */
 
-  public double numOfAtoms(String formula) {
-    double numAtoms = 0;
+  public int numOfAtoms(String formula) {
+    int numAtoms = 0;
     int index = 0;
-    for (int subscript : parse.getSubscripts(formula)) {
-      numAtoms += subscript * parse.getCoefficients(formula).get(index);
+    for (int subscript : formulaParser.parseFormula(formula).getSubscripts()) {
+      numAtoms += subscript * formulaParser.parseFormula(formula).getCoefficients().get(index);
       index++;
     }
     return numAtoms;

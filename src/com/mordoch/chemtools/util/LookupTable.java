@@ -1,5 +1,6 @@
 /*
- * Copyright Ariel Mordoch 2014 This file is part of Chemistry Tools.
+ * Copyright Ariel Mordoch 2014 
+ * This file is part of Chemistry Tools.
  * 
  * Chemistry Tools is free software: you can redistribute it and/or modify it under the terms of the
  * Lesser GNU General Public License as published by the Free Software Foundation, either version 3
@@ -48,12 +49,15 @@ public class LookupTable {
   public static final double BOLTZMANN_CONSTANT = 1.38065 * Math.pow(10, -23);
   public static final double PROTON_ELECTRON_CHARGE = 1.602176 * Math.pow(10, -19);
   public static final double RYDBERG_CONSTANT = 1.0973731568539;
-  public static final double PLANCK_CONSTANT = 0;
+  public static final double PLANCK_CONSTANT = 6.62606957 * Math.pow(10, -34);
 
-  // Create three Maps that hold element data. Empty until filled by the constructor
-  private Map<String, Double> molarMass = new HashMap<String, Double>(118, 1.01f);
-  private Map<String, Integer> atomicNumber = new HashMap<String, Integer>(118, 1.01f);
-  private Map<String, String> name = new HashMap<String, String>(118, 1.01f);
+  // Declare maps that hold element data
+  private Map<String, Double> molarMass;
+  private Map<String, Integer> atomicNumber;
+  private Map<String, String> name;
+  private Map<String, Integer> charge;
+  private Map<String, String> family;
+
 
   /**
    * This constructor fills the map corresponding to the desiredMap argument.
@@ -74,58 +78,67 @@ public class LookupTable {
     switch (desiredMap) {
 
       case 1:
-        molarMass();
+        molarMass = new HashMap<String, Double>(118, 1.01f);
+        addMolarMass();
         break;
       case 2:
-        atomicNumber();
+        atomicNumber = new HashMap<String, Integer>(118, 1.01f);
+        addAtomicNumber();
         break;
       case 3:
-        name();
+        name = new HashMap<String, String>(118, 1.01f);
+        addName();
         break;
+      case 4:
+        charge = new HashMap<String, Integer>(118, 1.01f);
+        addCharge();
+        break;
+      case 5:
+        family = new HashMap<String, String>(118, 1.01f);
+        addFamily();
       default:
-        molarMass();
-        atomicNumber();
-        name();
+        addMolarMass();
+        addAtomicNumber();
+        addName();
+        addCharge();
+        addFamily();
 
     }
 
   }
 
   /**
-   * If you want to fill all the Map objects with data, use this constructor.
+   * This constructor populates the instance with all possible data.
    */
 
   public LookupTable() {
-    molarMass();
-    atomicNumber();
-    name();
+    molarMass = new HashMap<String, Double>();
+    atomicNumber = new HashMap<String, Integer>();
+    name = new HashMap<String, String>();
+    family = new HashMap<String, String>();
+    addMolarMass();
+    addAtomicNumber();
+    addName();
+    addFamily();
   }
 
 
   /**
-   * Assembles a List of type Object object containing all the Map objects in this class. It is
-   * recommended to avoid using this method as it is an inefficient way of referencing element data,
-   * however, it exists for some case where it may be useful.
+   * Assembles a List of type Object object containing all the Map objects in this class.
    * 
-   * @return a List of type Object containing all the Map objects in LookupTable.
+   * @deprecated
+   * @return null
    * @since 0.1
    */
 
   public List<Object> data() {
-    // Create the list
-    List<Object> data = new ArrayList<Object>();
-    // Add the maps to the list
-    data.add(name);
-    data.add(molarMass);
-    data.add(atomicNumber);
-    // Return the list
-    return data;
+    return null;
   }
 
   /**
    * Finds information about an element and then returns a list containing that information.
    * <p>
-   * Format: name, atomic number, atomic mass, molar mass
+   * Format: name, family, atomic number, atomic mass, molar mass
    * </p>
    * 
    * @param element a string containing the symbol for an element.
@@ -141,6 +154,8 @@ public class LookupTable {
 
     // Name
     elementInfo.add(name.get(element));
+    // Family
+    elementInfo.add(family.get(element));
     // Atomic number
     elementInfo.add(Integer.toString(atomicNumber.get(element), 10));
     // Atomic mass
@@ -151,32 +166,33 @@ public class LookupTable {
     return elementInfo;
   }
 
-  public double getMolarMass(String element) {
+  public final double getMolarMass(String element) {
     return molarMass.get(element);
   }
 
-  public int getAtomicNumber(String element) {
+  public final int getAtomicNumber(String element) {
     return atomicNumber.get(element);
   }
 
-  public double getAtomicMass(String element) {
+  public final double getAtomicMass(String element) {
     return molarMass.get(element);
   }
 
-  public String getName(String element) {
+  public final String getName(String element) {
     return name.get(element);
   }
 
+  public final String getFamily(String element) {
+    return family.get(element);
+  }
+
   /**
-   * Defines and returns a Map<<x>String, Double> containing the atomic/molar masses of every
-   * element on the periodic table. Each element was added in order for the sake of convenience.
+   * Populates molarMass with the molar masses of each element.
    * 
-   * @return A Map<<x>String, Double> where the key is the atomic symbol, and the value is the
-   *         atomic/molar mass.
    * @since 0.1
    */
 
-  private final void molarMass() {
+  private final void addMolarMass() {
     // Source: http://www.ptable.com
     molarMass.put("H", 1.008);
     molarMass.put("He", 4.002602);
@@ -299,15 +315,13 @@ public class LookupTable {
     molarMass.put("Lr", 262.);
   }
 
-
   /**
-   * Defines and returns a Map containing elements and their corresponding atomic numbers.
+   * Populates atomicNumber with the atomic number of each element.
    * 
-   * @return A Map containing elements and their atomic numbers.
    * @since 0.1
    */
 
-  private final void atomicNumber() {
+  private final void addAtomicNumber() {
     atomicNumber.put("H", 1);
     atomicNumber.put("He", 2);
     atomicNumber.put("Li", 3);
@@ -430,13 +444,12 @@ public class LookupTable {
   }
 
   /**
-   * Defines and returns a Map containing elements and their corresponding names.
+   * Populates name with the names of each element.
    * 
-   * @return A Map containing elements and their names.
    * @since 0.1
    */
 
-  private final void name() {
+  private final void addName() {
     name.put("H", "Hydrogen");
     name.put("He", "Helium");
     name.put("Li", "Lithuim");
@@ -555,7 +568,253 @@ public class LookupTable {
     name.put("Fm", "Fermium");
     name.put("Md", "Mendelvium");
     name.put("No", "Nobelium");
-    name.put("Lr", "Lawrenium");
+    name.put("Lr", "Lawrencium");
+  }
+
+  /**
+   * Populates charge with the charge of each element. If no charge data was available, or the
+   * charge was variable, the value will be 999.
+   * 
+   * @since 0.6
+   */
+
+  private final void addCharge() {
+    int unknown = 999;
+    charge.put("H", 1);
+    charge.put("Li", 1);
+    charge.put("Na", 1);
+    charge.put("K", 1);
+    charge.put("Rb", 1);
+    charge.put("Cs", 1);
+    charge.put("Fr", 1);
+    charge.put("Be", 2);
+    charge.put("Mg", 2);
+    charge.put("Ca", 2);
+    charge.put("Sr", 2);
+    charge.put("Ba", 2);
+    charge.put("Ra", 2);
+    charge.put("Sc", unknown);
+    charge.put("Y", unknown);
+    charge.put("Ti", unknown);
+    charge.put("Zr", unknown);
+    charge.put("Hf", unknown);
+    charge.put("Rf", unknown);
+    charge.put("V", unknown);
+    charge.put("Nb", unknown);
+    charge.put("Ta", unknown);
+    charge.put("Db", unknown);
+    charge.put("Cr", unknown);
+    charge.put("Mo", unknown);
+    charge.put("W", unknown);
+    charge.put("Sg", unknown);
+    charge.put("Mn", unknown);
+    charge.put("Tc", unknown);
+    charge.put("Re", unknown);
+    charge.put("Bh", unknown);
+    charge.put("Fe", unknown);
+    charge.put("Ru", unknown);
+    charge.put("Os", unknown);
+    charge.put("Hs", unknown);
+    charge.put("Co", unknown);
+    charge.put("Rh", unknown);
+    charge.put("Ir", unknown);
+    charge.put("Mt", unknown);
+    charge.put("Ds", unknown);
+    charge.put("Cu", unknown);
+    charge.put("Ag", unknown);
+    charge.put("Au", unknown);
+    charge.put("Rg", unknown);
+    charge.put("Zn", unknown);
+    charge.put("Cd", unknown);
+    charge.put("Hg", unknown);
+    charge.put("Cn", unknown);
+    charge.put("B", unknown);
+    charge.put("Al", unknown);
+    charge.put("Ga", unknown);
+    charge.put("In", unknown);
+    charge.put("Tl", unknown);
+    charge.put("Uut", unknown);
+    charge.put("C", unknown);
+    charge.put("Si", unknown);
+    charge.put("Ge", unknown);
+    charge.put("Sn", unknown);
+    charge.put("Pb", unknown);
+    charge.put("Fl", unknown);
+    charge.put("N", -3);
+    charge.put("P", -3);
+    charge.put("As", -3);
+    charge.put("Sb", -3);
+    charge.put("Bi", -3);
+    charge.put("Uup", unknown);
+    charge.put("O", -2);
+    charge.put("S", -2);
+    charge.put("Se", -2);
+    charge.put("Te", -2);
+    charge.put("Po", -2);
+    charge.put("Lv", -2);
+    charge.put("F", -1);
+    charge.put("Cl", -1);
+    charge.put("Br", -1);
+    charge.put("I", -1);
+    charge.put("At", -1);
+    charge.put("Uus", unknown);
+    charge.put("He", 0);
+    charge.put("Ne", 0);
+    charge.put("Ar", 0);
+    charge.put("Kr", 0);
+    charge.put("Xe", 0);
+    charge.put("Rn", 0);
+    charge.put("Uuo", unknown);
+    charge.put("La", unknown);
+    charge.put("Ac", unknown);
+    charge.put("Ce", unknown);
+    charge.put("Th", unknown);
+    charge.put("Pr", unknown);
+    charge.put("Pa", unknown);
+    charge.put("U", unknown);
+    charge.put("Pm", unknown);
+    charge.put("Np", unknown);
+    charge.put("Sm", unknown);
+    charge.put("Pu", unknown);
+    charge.put("Eu", unknown);
+    charge.put("Am", unknown);
+    charge.put("Gd", unknown);
+    charge.put("Cm", unknown);
+    charge.put("Tb", unknown);
+    charge.put("Bk", unknown);
+    charge.put("Cf", unknown);
+    charge.put("Ho", unknown);
+    charge.put("Es", unknown);
+    charge.put("Er", unknown);
+    charge.put("Fm", unknown);
+    charge.put("Tm", unknown);
+    charge.put("Md", unknown);
+    charge.put("Yb", unknown);
+    charge.put("No", unknown);
+    charge.put("Lu", unknown);
+    charge.put("Lr", unknown);
+  }
+
+  private final void addFamily() {
+    family.put("H", "Nonmetal");
+    family.put("He", "Noble Gas");
+    family.put("Li", "Alkali Metal");
+    family.put("Be", "Alkaline Earth Metal");
+    family.put("B", "Metalloid");
+    family.put("C", "Nonmetal");
+    family.put("N", "Nonmetal");
+    family.put("O", "Nonmetal");
+    family.put("F", "Halogen");
+    family.put("Ne", "Noble Gas");
+    family.put("Na", "Alkali Metal");
+    family.put("Mg", "Alkaline Earth Metal");
+    family.put("Al", "Post-tranistion metal");
+    family.put("Si", "Metalloid");
+    family.put("P", "Nonemtal");
+    family.put("S", "Nonemtal");
+    family.put("Cl", "Halogen");
+    family.put("Ar", "Noble Gas");
+    family.put("K", "Alkali Metal");
+    family.put("Ca", "Alkaline Earth Metal");
+    family.put("Sc", "Transition Metal");
+    family.put("Ti", "Transition Metal");
+    family.put("V", "Transition Metal");
+    family.put("Cr", "Transition Metal");
+    family.put("Mn", "Tranisition Metal");
+    family.put("Fe", "Transition Metal");
+    family.put("Co", "Transition Metal");
+    family.put("Ni", "Transition Metal");
+    family.put("Cu", "Transition Metal");
+    family.put("Zn", "Transition Metal");
+    family.put("Ga", "Post-transition Metal");
+    family.put("Ge", "Metalloid");
+    family.put("As", "Metalloid");
+    family.put("Se", "Nonmetal");
+    family.put("Br", "Halogen");
+    family.put("Kr", "Noble Gas");
+    family.put("Rb", "Alkali Metal");
+    family.put("Sr", "Alkaline Earth Metal");
+    family.put("Y", "Transition Metal");
+    family.put("Zr", "Transition Metal");
+    family.put("Nb", "Transition Metal");
+    family.put("Mo", "Transition Metal");
+    family.put("Tc", "Transition Metal");
+    family.put("Ru", "Transition Metal");
+    family.put("Rh", "Transition Metal");
+    family.put("Pd", "Transition Metal");
+    family.put("Ag", "Transition Metal");
+    family.put("Cd", "Transition Metal");
+    family.put("In", "Post-transition Metal");
+    family.put("Sn", "Post-transition Metal");
+    family.put("Sb", "Metalloid");
+    family.put("Te", "Metalloid");
+    family.put("I", "Halogen");
+    family.put("Xe", "Noble Gas");
+    family.put("Cs", "Alkali Metal");
+    family.put("Ba", "Alkaline Earth Metal");
+    family.put("Hf", "Transition Metal");
+    family.put("Ta", "Transition Metal");
+    family.put("W", "Transition Metal");
+    family.put("Re", "Transition Metal");
+    family.put("Os", "Transition Metal");
+    family.put("Ir", "Transition Metal");
+    family.put("Pt", "Transition Metal");
+    // I LOVE GOOOOOOOOOOOOLD
+    family.put("Au", "Transition Metal");
+    family.put("Hg", "Transition Metal");
+    family.put("Tl", "Post-transition Metal");
+    family.put("Pb", "Post-transition Metal");
+    family.put("Bi", "Post-transition Metal");
+    family.put("Po", "Metalloid");
+    family.put("At", "Halogen");
+    family.put("Rn", "Noble Gas");
+    family.put("Fr", "Alkali Metal");
+    family.put("Ra", "Alkaline Earth Metal");
+    family.put("Rf", "Transition Metal");
+    family.put("Db", "Transition Metal");
+    family.put("Sg", "Transition Metal");
+    family.put("Bh", "Transition Metal");
+    family.put("Hs", "Transition Metal");
+    family.put("Mt", "Transition Metal");
+    family.put("Ds", "Transition Metal");
+    family.put("Rg", "Transition Metal");
+    family.put("Cn", "Transition Metal");
+    family.put("Uut", "Post-transition Metal");
+    family.put("Fl", "Post-Transition Metal");
+    family.put("Uup", "Post-transition Metal");
+    family.put("Lv", "Post-transition Metal");
+    family.put("Uus", "Metalloid (undetermined)");
+    family.put("Uuo", "Noble Gas (undetermined)");
+    family.put("La", "Lanthanide");
+    family.put("Ce", "Lanthanide");
+    family.put("Pr", "Lanthanide");
+    family.put("Nd", "Lanthanide");
+    family.put("Pm", "Lanthanide");
+    family.put("Sm", "Lanthanide");
+    family.put("Eu", "Lanthanide");
+    family.put("Gd", "Lanthanide");
+    family.put("Tb", "Lanthanide");
+    family.put("Dy", "Lanthanide");
+    family.put("Ho", "Lanthanide");
+    family.put("Er", "Lanthanide");
+    family.put("Tm", "Lanthanide");
+    family.put("Yb", "Lanthanide");
+    family.put("Lu", "Lanthanide");
+    family.put("Ac", "Actinide");
+    family.put("Th", "Actinide");
+    family.put("Pa", "Actinide");
+    family.put("U", "Actinide");
+    family.put("Np", "Actinide");
+    family.put("Pu", "Actinide");
+    family.put("Am", "Actinide");
+    family.put("Cm", "Actinide");
+    family.put("Bk", "Actinide");
+    family.put("Cf", "Actinide");
+    family.put("Es", "Actinide");
+    family.put("Fm", "Actinide");
+    family.put("Md", "Actinide");
+    family.put("No", "Actinide");
+    family.put("Lr", "Actinide");
   }
 
 }

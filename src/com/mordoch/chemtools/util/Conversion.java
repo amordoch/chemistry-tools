@@ -1,5 +1,6 @@
 /*
- * Copyright Ariel Mordoch 2014 This file is part of Chemistry Tools.
+ * Copyright Ariel Mordoch 2014
+ * This file is part of Chemistry Tools.
  * 
  * Chemistry Tools is free software: you can redistribute it and/or modify it under the terms of the
  * Lesser GNU General Public License as published by the Free Software Foundation, either version 3

@@ -1,5 +1,6 @@
 /*
- * Copyright Ariel Mordoch 2014 This file is part of Chemistry Tools.
+ * Copyright Ariel Mordoch 2014 
+ * This file is part of Chemistry Tools.
  * 
  * Chemistry Tools is free software: you can redistribute it and/or modify it under the terms of the
  * Lesser GNU General Public License as published by the Free Software Foundation, either version 3
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import com.mordoch.chemtools.Main;
+import com.mordoch.chemtools.formulatools.FormulaHelper;
 import com.mordoch.chemtools.util.Analysis;
 import com.mordoch.chemtools.util.Conversion;
 import com.mordoch.chemtools.util.LookupTable;
@@ -33,15 +35,17 @@ import com.mordoch.chemtools.util.LookupTable;
  */
 
 public class Menu {
-
+  
   private LookupTable lookup = new LookupTable();
-  private Analysis analysis = new Analysis();
+  private FormulaHelper parser = new FormulaHelper(lookup);
+  private Analysis analysis = new Analysis(lookup, parser);
   private Scanner input = new Scanner(System.in);
 
   /**
    * The main menu that leads to all other options. All command line functions happen and exit
    * within this method.
-   * @throws InterruptedException if thread was interrupted when showing a warning menu. 
+   * 
+   * @throws InterruptedException if thread was interrupted when showing a warning menu.
    * @since 0.6-alpha
    */
 
@@ -89,13 +93,15 @@ public class Menu {
           } finally {
             // Finally, print element info
             println("Name: " + elementInfo.get(0));
-            println("Atomic number: " + elementInfo.get(1));
+            println("Type: " + elementInfo.get(1));
+            println("Atomic number: " + elementInfo.get(2));
             println("Atomic mass: " + elementInfo.get(3) + " amu");
-            println("Molar mass: " + elementInfo.get(2) + " g/mol");
+            println("Molar mass: " + elementInfo.get(4) + " g/mol");
             // Stop looping
             inputIsValid = true;
           }
         }
+        Thread.sleep(2000);
         mainMenu();
         break;
 
@@ -104,13 +110,12 @@ public class Menu {
         System.exit(1);
 
       case 99:
-        // System.out.println( analysis.computeMolarMass("(3)Na(3)Cl") );
+        System.out.println( analysis.molecularFromEmpirical("C1H2O1", 180.156) );
         break;
 
       default:
         // Start again
         mainMenu();
-
     }
   } // end mainMenu
 
@@ -401,6 +406,9 @@ public class Menu {
     println("0: Empirical formula using percent composition");
     println("1: Empirical formula using mass composition");
     println("2: Molecular formula from empirical formula");
+    println("3: Molar mass of a formula");
+    println("4: Mass of a formula");
+    println("5: Number of atoms in a formula");
 
     switch (input.nextInt()) {
 
@@ -416,6 +424,18 @@ public class Menu {
         molecularFormulaMenu();
         break;
 
+      case 3:
+        molarMassMenu();
+        break;
+        
+      case 4:
+        massMenu();
+        break;
+        
+      case 5:
+        numAtomsMenu();
+        break;
+        
       default:
         // Return to main menu
         mainMenu();
@@ -515,14 +535,34 @@ public class Menu {
     String formula = input.next();
     println("Enter the molar mass of the molecular formula: ");
     double molarMassCompound = input.nextDouble();
-    List<Integer> result = analysis.molecularFromEmpirical(formula, molarMassCompound);
+    String result = analysis.molecularFromEmpirical(formula, molarMassCompound);
     System.out.println();
     System.out.println(result);
 
   }
 
-  /* WARNINGS */
+  private void molarMassMenu() {
+    println("Enter a formula: ");
+    String formula = input.next();
+    println(analysis.computeMolarMass(formula) + " g/mol");
+  }
   
+  private void massMenu() {
+    println("Enter a formula: ");
+    String formula = input.next();
+    println("Enter the moles of that formula: ");
+    double moles = input.nextDouble();
+    println( analysis.computeMass(formula, moles) + " g" );
+  }
+  
+  private void numAtomsMenu() {
+    println("Enter a formula: ");
+    String formula = input.next();
+    println( analysis.numOfAtoms(formula) + " atoms");
+  }
+  
+  /* WARNINGS */
+
   private void warningMenu(int desiredWarning) {
 
     switch (desiredWarning) {

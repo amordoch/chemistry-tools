@@ -1,5 +1,6 @@
 /*
- * Copyright Ariel Mordoch 2014 This file is part of Chemistry Tools.
+ * Copyright Ariel Mordoch 2014 
+ * This file is part of Chemistry Tools.
  * 
  * Chemistry Tools is free software: you can redistribute it and/or modify it under the terms of the
  * Lesser GNU General Public License as published by the Free Software Foundation, either version 3
@@ -13,30 +14,40 @@
  * Tools. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.mordoch.chemtools.util;
+package com.mordoch.chemtools.formulatools;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mordoch.chemtools.util.LookupTable;
+
 /**
- * This class parses certain data, such as formulas, and contains getters relevant to that parsed
- * data.
+ * The sole purpose of this class is to offload excess methods from Formula.
  * 
  * @author Ariel Mordoch
  * @version 1.0
- * @since 0.6.5-alpha
+ * @since 0.6.8-alpha
  */
 
-public class Parser {
+public class FormulaHelper {
 
-  private LookupTable lookup = new LookupTable();
-
-  /* FORMULAE THAT CONTAIN ONE ATOM OF AN ELEMENT MUST EXPLICITLY CONTAIN A 1 AFTER THE ELEMENT. */
+  private LookupTable lookup;
 
   /**
-   * This method takes a string such as "C6H12O6" and separates the formula into a List. This makes
-   * it much easier to get relevant data like the elements in the formula and their subscripts
-   * later. There are a number of rules to follow:
+   * Since {@link FormulaHelper#parseFormula(String)} uses a LookupTable, pass a LookupTable
+   * reference when creating a FormulaHelper.
+   * 
+   * @param table a LookupTable
+   */
+
+  public FormulaHelper(LookupTable table) {
+    this.lookup = table;
+  }
+
+  /**
+   * This method takes a string such as "C6H12O6" and adds the elements, subscripts, and
+   * coefficients into a Formula object. This makes it much easier to get relevant data like the
+   * elements in the formula and their subscripts later. There are a number of rules to follow:
    * <ol>
    * <li>If a formula contains only 1 atom of a given element and multiple atoms of another element,
    * it must be explicitly stated, e.g. carbon dioxide become "C1O2".</li>
@@ -47,29 +58,25 @@ public class Parser {
    * "(2)C6(2)H12(2)O6".</li>
    * </ol>
    * 
-   * @param formula a string such as "C6H12O6" to parse
-   * @return a List<<x>Object> containing the coefficients first (as a List<<x>Double>) subscripts
-   *         first (as ints), then the elements (as Strings).
+   * @param formulaToParse a string such as "C6H12O6" to parse
+   * @return a Formula object representing formulaToParse
    */
 
-  private List<Object> parseSimpleFormula(String formula) {
-
-    // First create a list of Objects that hold formula data
-    List<Object> parsedFormula = new ArrayList<Object>();
+  public Formula parseFormula(String formulaToParse) {
+    // Create a new formula (ignore the constructor argument for now)
+    Formula formula = new Formula("Ionic");
     // Convert the string to an array of chars
-    char[] asCharArray = formula.toCharArray();
+    char[] asCharArray = formulaToParse.toCharArray();
 
     /************** COEFFICIENTS **************/
+    // Starting character for search is '(', ending character is ')'
+    List<Double> listOfCoefficients = new ArrayList<Double>();
 
-    // Starting character for coefficient search '(', ending character ')'
-    List<Double> coefficients = new ArrayList<Double>();
-    // Loop through the array
     for (int index = 0; index < asCharArray.length; index++) {
       // Is the element '('? If so, loop through until we find ')'
       if (asCharArray[index] == '(') {
         // Set the '(' to '/'
         asCharArray[index] = '/';
-        // A string that holds the final value of the integer
         String finalValue = "";
         // Loop until we find ')'
         int indexForWhile = index + 1;
@@ -81,16 +88,16 @@ public class Parser {
         }
         // Since the current char is ')', set it to '/'
         asCharArray[indexForWhile] = '/';
-        // Now that we've constructed a number, add it to finalValue.
-        coefficients.add(Double.parseDouble(finalValue));
+        // Now that we've constructed a number, add it to listOfCoefficients.
+        listOfCoefficients.add(Double.parseDouble(finalValue));
       }
     }
-    // Add coefficients to parsedFormula
-    parsedFormula.add(coefficients);
+    formula.setCoefficients(listOfCoefficients);
 
     /************** SUBSCRIPTS **************/
 
-    // Now loop to find the integers that are subscripts
+    List<Integer> listOfSubscripts = new ArrayList<Integer>();
+
     for (int index = 0; index < asCharArray.length; index++) {
       // A pattern to compare the current char to.
       String possibleDigits = "0123456789";
@@ -118,21 +125,21 @@ public class Parser {
             currentCharIsAnInt = possibleDigits.indexOf(asCharArray[indexForWhile]) != -1;
           }
         }
-        // Final value is constructed, so add finalValue to parsedFormula
-        parsedFormula.add(Integer.parseInt(finalValue));
+        listOfSubscripts.add(Integer.parseInt(finalValue));
       }
-
     }
+    formula.setSubscripts(listOfSubscripts);
 
     /************** ELEMENTS **************/
 
-    // Now loop to find elements
+    List<String> listOfElements = new ArrayList<String>();
+
     for (int index = 0; index < asCharArray.length; index++) {
       // If this is the last index, skip the two-letter symbol check
       if (index == asCharArray.length - 1) {
         if (asCharArray[index] != '/') {
-          // Concatenate the two characters then add to parsedFormula
-          parsedFormula.add(Character.toString(asCharArray[index]));
+          // Concatenate the two characters then add to elements
+          listOfElements.add(Character.toString(asCharArray[index]));
           // Discard element
           asCharArray[index] = '/';
         }
@@ -147,104 +154,43 @@ public class Parser {
             lookup.getMolarMass(Character.toString(asCharArray[index])
                 + Character.toString(asCharArray[index + 1]));
           } catch (NullPointerException e) {
-            parsedFormula.add(Character.toString(asCharArray[index]));
+            listOfElements.add(Character.toString(asCharArray[index]));
             isSingleElement = true;
           }
           // If we have a single element, don't run this code
           if (!isSingleElement) {
             // Concatenate the two characters then add to parsedFormula
-            parsedFormula.add(Character.toString(asCharArray[index])
+            listOfElements.add(Character.toString(asCharArray[index])
                 + Character.toString(asCharArray[index + 1]));
             // Discard the elements
             asCharArray[index] = '/';
             asCharArray[index + 1] = '/';
           }
-        } // If element is a single-letter symbol
-        else if (asCharArray[index] != '/') {
+        } else if (asCharArray[index] != '/') {
           // Add to to parsedFormula
-          parsedFormula.add(Character.toString(asCharArray[index]));
+          listOfElements.add(Character.toString(asCharArray[index]));
           // Discard element
           asCharArray[index] = '/';
         }
 
       }
     }
+    formula.setElements(listOfElements);
 
     /************** RETURN **************/
 
-    // No need for asCharArray anymore, so scrap it
+    // No need for asCharArray or the rest of the objects anymore, so send them to garbage
+    // collection!
     asCharArray = null;
-    // Return parsed formula
-    return parsedFormula;
+    listOfCoefficients = null;
+    listOfSubscripts = null;
+    listOfElements = null;
+    // Return the Formula object
+    return formula;
   }
 
-  /**
-   * Gets the elements of a formula.
-   * 
-   * @param formula a formula, such as "C6H12O6"
-   * @return the elements of a formula (in the above example, it would return ["C", "H", "O"])
-   */
-
-  public List<String> getElements(String formula) {
-    List<Object> parsedFormula = parseSimpleFormula(formula);
-    List<String> elements = new ArrayList<String>();
-    for (Object element : parsedFormula) {
-      if (element.getClass().equals(String.class)) {
-        elements.add((String) element);
-      }
-    }
-    if (elements.isEmpty()) {
-      elements = null;
-    }
-    return elements;
+  public List<Formula> parseEquation(String equationToParse) {
+    return null;
   }
-
-  /**
-   * Gets the subscripts of each element in a formula.
-   * 
-   * @param formula a formula, such as "C6H12O6"
-   * @return the subscripts of each element in that formula (in the above case, it would return [6,
-   *         12, 6])
-   */
-
-  public List<Integer> getSubscripts(String formula) {
-    List<Object> parsedFormula = parseSimpleFormula(formula);
-    List<Integer> subscripts = new ArrayList<Integer>();
-    for (Object subscript : parsedFormula) {
-      if (subscript.getClass().equals(Integer.class)) {
-        subscripts.add((Integer) subscript);
-      }
-    }
-    // If subscripts is empty, add 1's corresponding to the amount of elements in the formula
-    if (subscripts.isEmpty()) {
-      for (Object element : parsedFormula) {
-        if (element.getClass().equals(String.class)) {
-          subscripts.add(1);
-        }
-      }
-    }
-    return subscripts;
-  }
-
-  /**
-   * Gets the coefficients of a given formula, provided they are contained within parentheses.
-   * 
-   * @param formula a formula represented by a string, for example (2)Na(2)Cl
-   * @return a List of type Double containing the coefficients of the given formula
-   */
-
-  @SuppressWarnings("unchecked")
-  public List<Double> getCoefficients(String formula) {
-    List<Double> coefficients = (List<Double>) parseSimpleFormula(formula).get(0);
-    // If there were no coefficients, add 1.0 to coefficients corresponding to the amount of
-    // elements in a formula.
-    if (coefficients.isEmpty()) {
-      for (Object element : parseSimpleFormula(formula)) {
-        if (element.getClass().equals(String.class)) {
-          coefficients.add(1.0);
-        }
-      }
-    }
-    return coefficients;
-  }
+  
 }
