@@ -35,7 +35,7 @@ import com.mordoch.chemtools.util.LookupTable;
  */
 
 public class Menu {
-  
+
   private LookupTable lookup = new LookupTable();
   private FormulaHelper parser = new FormulaHelper(lookup);
   private Analysis analysis = new Analysis(lookup, parser);
@@ -110,7 +110,7 @@ public class Menu {
         System.exit(1);
 
       case 99:
-        System.out.println( analysis.molecularFromEmpirical("C1H2O1", 180.156) );
+        // Debug
         break;
 
       default:
@@ -399,8 +399,11 @@ public class Menu {
   private void analysisMenu() throws InterruptedException {
 
     System.out.println();
-    warningMenu(1);
-    Thread.sleep(1000 * 10);
+    if (!hasSeenFormulaWarning) {
+      warningMenu(1);
+      hasSeenFormulaWarning = true;
+      Thread.sleep(1000 * 10);
+    }
     System.out.println();
     println("Choose an option or enter any integer to go back:");
     println("0: Empirical formula using percent composition");
@@ -427,15 +430,15 @@ public class Menu {
       case 3:
         molarMassMenu();
         break;
-        
+
       case 4:
         massMenu();
         break;
-        
+
       case 5:
         numAtomsMenu();
         break;
-        
+
       default:
         // Return to main menu
         mainMenu();
@@ -546,22 +549,24 @@ public class Menu {
     String formula = input.next();
     println(analysis.computeMolarMass(formula) + " g/mol");
   }
-  
+
   private void massMenu() {
     println("Enter a formula: ");
     String formula = input.next();
     println("Enter the moles of that formula: ");
     double moles = input.nextDouble();
-    println( analysis.computeMass(formula, moles) + " g" );
+    println(analysis.computeMass(formula, moles) + " g");
   }
-  
+
   private void numAtomsMenu() {
     println("Enter a formula: ");
     String formula = input.next();
-    println( analysis.numOfAtoms(formula) + " atoms");
+    println(analysis.numOfAtoms(formula) + " atoms");
   }
-  
+
   /* WARNINGS */
+
+  private boolean hasSeenFormulaWarning = false;
 
   private void warningMenu(int desiredWarning) {
 
@@ -572,11 +577,12 @@ public class Menu {
         println("This program only understands "
             + "formulas that are written in a certain syntax. "
             + "A single syntactic mistake will crash this program, so read the following syntax examples carefully.");
-        println("C6H12O2 remains C6H12O2");
+        println("C6H12O6 remains C6H12O6");
         println("NaCl remains NaCl");
         println("CO2 becomes C1O2");
         println("H2O becomes H2O1");
-        println("2( (NO3)3 ) becomes (2)N3(2)O9 or N6O18 ");
+        println("2( (NO3)3 ) becomes (2)N3O9 or N6O18 ");
+        println("(2)NaCl remains (2)NaCl");
         break;
 
       default:

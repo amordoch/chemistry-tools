@@ -25,7 +25,7 @@ import com.mordoch.chemtools.util.LookupTable;
  * The sole purpose of this class is to offload excess methods from Formula.
  * 
  * @author Ariel Mordoch
- * @version 1.0
+ * @version 1.5
  * @since 0.6.8-alpha
  */
 
@@ -50,12 +50,9 @@ public class FormulaHelper {
    * elements in the formula and their subscripts later. There are a number of rules to follow:
    * <ol>
    * <li>If a formula contains only 1 atom of a given element and multiple atoms of another element,
-   * it must be explicitly stated, e.g. carbon dioxide become "C1O2".</li>
+   * it must be explicitly stated, e.g. carbon dioxide becomes "C1O2".</li>
    * <li>If a formula contains a coefficient, it must be written within parenthesis, e.g. "(.5)O2"</li>
    * <li>Fractional coefficients must be input as decimals.</li>
-   * <li>If you have multiple moles of a particular molecule, you must distribute the two across
-   * each element. For example, if you had 2 moles of Glucose, the input would be
-   * "(2)C6(2)H12(2)O6".</li>
    * </ol>
    * 
    * @param formulaToParse a string such as "C6H12O6" to parse
@@ -70,7 +67,7 @@ public class FormulaHelper {
 
     /************** COEFFICIENTS **************/
     // Starting character for search is '(', ending character is ')'
-    List<Double> listOfCoefficients = new ArrayList<Double>();
+    double coefficient = 0;
 
     for (int index = 0; index < asCharArray.length; index++) {
       // Is the element '('? If so, loop through until we find ')'
@@ -88,11 +85,11 @@ public class FormulaHelper {
         }
         // Since the current char is ')', set it to '/'
         asCharArray[indexForWhile] = '/';
-        // Now that we've constructed a number, add it to listOfCoefficients.
-        listOfCoefficients.add(Double.parseDouble(finalValue));
+        // Now that we've constructed a number, that's the coefficient.
+        coefficient = Double.parseDouble(finalValue);
       }
     }
-    formula.setCoefficients(listOfCoefficients);
+    formula.setCoefficient(coefficient);
 
     /************** SUBSCRIPTS **************/
 
@@ -182,15 +179,48 @@ public class FormulaHelper {
     // No need for asCharArray or the rest of the objects anymore, so send them to garbage
     // collection!
     asCharArray = null;
-    listOfCoefficients = null;
     listOfSubscripts = null;
     listOfElements = null;
     // Return the Formula object
     return formula;
   }
 
-  public List<Formula> parseEquation(String equationToParse) {
-    return null;
+  /**
+   * Takes an equation in string form, such as "H2 + (.5)O2 ---&gt; H2O1", and returns an Equation
+   * object representing that equation. This method splits the reactants and products into
+   * individual formulas using {@link FormulaHelper#parseFormula(String)}, so keep in mind that the
+   * equation's parts must be syntactically compatible with it. <strong>In order for this method
+   * function, the reactants and products must be separated by the sequence '---&gt;' exactly.</strong>
+   * 
+   * @param equationToParse a string containing the equation to parse
+   * @return an Equation object representing the given equation
+   */
+
+  public Equation parseEquation(String equationToParse) {
+    Equation parsedEquation = new Equation(Double.NaN);
+    // Sample: H2 + (.5)O2 ---> H2O1
+    // Split the 2 sides of the equation
+    String[] splitEquation = equationToParse.split("--->");
+    // Now split into individual formulas (remove spaces so as not to confuse parseFormula)
+    String allReactants = splitEquation[0].replaceAll("\\s", "");
+    String allProducts = splitEquation[1].replaceAll("\\s", "");
+    String[] individualReactants = allReactants.split("\\+");
+    String[] individualProducts = allProducts.split("\\+");
+    // Now parse each reactant & product and put them into their respective list
+    List<Formula> reactants = new ArrayList<Formula>();
+    List<Formula> products = new ArrayList<Formula>();
+    for (String reactant : individualReactants) {
+      reactants.add(parseFormula(reactant));
+    }
+    for (String product : individualProducts) {
+      products.add(parseFormula(product));
+    }
+    // Build the Equation object and return
+    parsedEquation.setReactants(reactants);
+    parsedEquation.setProducts(products);
+    reactants = null;
+    products = null;
+    return parsedEquation;
   }
-  
+
 }

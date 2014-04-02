@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mordoch.chemtools.Main;
+import com.mordoch.chemtools.formulatools.Equation;
 import com.mordoch.chemtools.formulatools.Formula;
 import com.mordoch.chemtools.formulatools.FormulaHelper;
 
@@ -36,12 +37,12 @@ public class Analysis {
 
   private LookupTable lookup;
   private FormulaHelper formulaParser;
-  
+
   public Analysis(LookupTable aLookupTable, FormulaHelper aFormulaHelper) {
     this.lookup = aLookupTable;
     this.formulaParser = aFormulaHelper;
   }
-  
+
   /**
    * This method takes 3 percents and 3 elements and finds the empirical formula for a compound
    * containing those elements (the molar masses of each element are found automatically. The user
@@ -167,18 +168,18 @@ public class Analysis {
   }
 
   /**
-   * This method takes a formula and the molar mass of a molecular formula and finds the subscripts of the molecular formula.
-   * For example, molecularFromEmpirical("CH2O", 180.156) returns [6, 12, 6].
+   * This method takes a formula and the molar mass of a molecular formula and finds the subscripts
+   * of the molecular formula. For example, molecularFromEmpirical("CH2O", 180.156) returns [6, 12,
+   * 6].
    * 
-   * @param empiricalFormula a chemical formula  syntactically compatible with
+   * @param empiricalFormula a chemical formula syntactically compatible with
    *        Parser#parseSimpleFormula
    * @param molarMassCompound the molar mass of a compound
    * @return an List of type Integer containing the molecular formula's subscripts
    * @since 0.3
    */
 
-  public final String molecularFromEmpirical(String empiricalFormula,
-      double molarMassCompound) {
+  public final String molecularFromEmpirical(String empiricalFormula, double molarMassCompound) {
     Formula parsedFormula = formulaParser.parseFormula(empiricalFormula);
     // Get the molar mass and subscripts of the empirical formula
     double molarMassEmpirical = computeMolarMass(empiricalFormula);
@@ -200,7 +201,7 @@ public class Analysis {
     // Construct the molecular formula
     String molecularFormula = "";
     int indexOfSubscripts = 0;
-    for (String element : elements ) {
+    for (String element : elements) {
       molecularFormula += element + roundedSubscripts.get(indexOfSubscripts);
       indexOfSubscripts++;
     }
@@ -233,22 +234,18 @@ public class Analysis {
     // that stores molar mass.
     List<Integer> subscripts = parsedFormula.getSubscripts();
     List<String> elements = parsedFormula.getElements();
-    List<Double> coefficients = parsedFormula.getCoefficients();
     double molarMass = 0;
     // Now loop through the elements. Each iteration, multiply the subscript by the molar mass of
     // the element and its coefficient and add to molarMass.
     // Note that the given formula must be syntactically compatible with
     // Parser#parseFormula().
     for (int index = 0; index < elements.size(); index++) {
-      molarMass +=
-          subscripts.get(index) * lookup.getMolarMass(elements.get(index))
-              * coefficients.get(index);
+      molarMass += subscripts.get(index) * lookup.getMolarMass(elements.get(index));
     }
     // Now discard all the objects and return.
     parsedFormula = null;
     subscripts = null;
     elements = null;
-    coefficients = null;
     return molarMass;
   }
 
@@ -276,11 +273,51 @@ public class Analysis {
 
   public int numOfAtoms(String formula) {
     int numAtoms = 0;
-    int index = 0;
-    for (int subscript : formulaParser.parseFormula(formula).getSubscripts()) {
-      numAtoms += subscript * formulaParser.parseFormula(formula).getCoefficients().get(index);
-      index++;
+    Formula parsedFormula = formulaParser.parseFormula(formula);
+    for (int subscript : parsedFormula.getSubscripts()) {
+      numAtoms += subscript * parsedFormula.getCoefficient();
     }
+    parsedFormula = null;
+    return numAtoms;
+  }
+
+  /**
+   * Computes the number of atoms on the reactants side of a chemical equation.
+   * 
+   * @param equation a valid chemical equation
+   * @return the number of atoms contained on the reactants side of the equation 
+   * (the side is insignificant if the equation is balanced)
+   */
+
+  public int numOfAtomsReactants(String equation) {
+    int numAtoms = 0;
+    Equation parsedEquation = formulaParser.parseEquation(equation);
+    List<Formula> reactants = parsedEquation.getReactants();
+    for (Formula reactant : reactants) {
+      numAtoms += numOfAtoms(reactant.original());
+    }
+    parsedEquation = null;
+    reactants = null;
+    return numAtoms;
+  }
+
+  /**
+   * Computes the number of atoms on the products side of a chemical equation.
+   * 
+   * @param equation a valid chemical equation
+   * @return the number of atoms contained on the products side of the equation 
+   * (the side is insignificant if the equation is balanced)
+   */
+  
+  public int numOfAtomsProducts(String equation) {
+    int numAtoms = 0;
+    Equation parsedEquation = formulaParser.parseEquation(equation);
+    List<Formula> products = parsedEquation.getProducts();
+    for (Formula product : products) {
+      numAtoms += numOfAtoms(product.original());
+    }
+    parsedEquation = null;
+    products = null;
     return numAtoms;
   }
 }

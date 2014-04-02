@@ -20,15 +20,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class parses certain data, such as formulas, and contains getters relevant to that parsed
- * data.
+ * This class acts as a means of representing chemical formulas as Java objects.
  * 
  * @author Ariel Mordoch
- * @version 1.5
+ * @version 1.5.1
  * @since 0.6.5-alpha
  */
 
 public class Formula {
+
+  // Formula data
+  private List<String> elements = new ArrayList<String>();
+  private List<Integer> subscripts = new ArrayList<Integer>();
+  private double coefficient;
+  private String type;
 
   /**
    * This constructor is used when passing a formula through
@@ -46,25 +51,18 @@ public class Formula {
    * 
    * @param listOfElements a List of type string that contains the elements of the formula
    * @param listOfSubscripts a List of type Integer that contains the subscripts of each element
-   * @param listOfCoefficients a List of type Double that contains the coefficients of each element
-   *        (an empty list is fine)
+   * @param coeff the coefficient of the formula
    * @param type ignore for now
    */
 
-  public Formula(List<String> listOfElements, List<Integer> listOfSubscripts,
-      List<Double> listOfCoefficients, String type) {
+  public Formula(List<String> listOfElements, List<Integer> listOfSubscripts, double coeff,
+      String type) {
     this.type = type;
     this.elements = listOfElements;
     this.subscripts = listOfSubscripts;
-    this.coefficients = listOfCoefficients;
+    this.coefficient = coeff;
   }
 
-  // Formula data
-  private List<String> elements = new ArrayList<String>();
-  private List<Integer> subscripts = new ArrayList<Integer>();
-  private List<Double> coefficients = new ArrayList<Double>();
-  private String type;
-  
   /**
    * Gets the elements of a formula.
    * 
@@ -102,16 +100,9 @@ public class Formula {
    * @return a List of type Double containing the coefficients of the given formula
    */
 
-  @SuppressWarnings("unused")
-  public final List<Double> getCoefficients() {
-    // If there were no coefficients, add 1.0 to coefficients corresponding to the amount of
-    // elements in a formula.
-    if (coefficients.isEmpty()) {
-      for (String element : elements) {
-        coefficients.add(1.0);
-      }
-    }
-    return coefficients;
+  public final double getCoefficient() {
+    // If there was no given coefficient, the coefficient is 1.
+    return coefficient;
   }
 
   /**
@@ -146,14 +137,14 @@ public class Formula {
    * Sets the coefficients of a formula. If a formula contains no subscripts, an array of a length
    * corresponding to the amount of elements and filled with 1's is fine.
    * 
-   * @param listOfCoefficients a List of type Double containing the coefficients of a formula
+   * @param aCoefficient the coefficient of the formula
    */
 
-  public final void setCoefficients(List<Double> listOfCoefficients) {
-    if (coefficients.isEmpty()) {
-      for (double coefficient : listOfCoefficients) {
-        coefficients.add(coefficient);
-      }
+  public final void setCoefficient(double aCoefficient) {
+    if (aCoefficient == 0) {
+      coefficient = 1;
+    } else {
+      coefficient = aCoefficient;
     }
   }
 
@@ -161,4 +152,13 @@ public class Formula {
     return type;
   }
 
+  public final String original() {
+    String originalFormula = "(" + coefficient + ")";
+    int indexOfSubscripts = 0;
+    for (String element : elements) {
+      originalFormula += element + subscripts.get(indexOfSubscripts);
+      indexOfSubscripts++;
+    }
+    return originalFormula;
+  }
 }
