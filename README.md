@@ -12,7 +12,7 @@ Package Summary
 | com.mordoch.chemtools | Main package |
 | com.mordoch.chemtools.interaction | Human-interface package |
 | com.mordoch.chemtools.util | Utility classes |
-| com.mordoch.chemtools.formulatools | Tools for representing chemical formulas as Java objects |
+| com.mordoch.chemtools.formulatools | Tools for representing chemical formulas and equations as Java objects |
 
 Class Summary
 
@@ -25,6 +25,7 @@ Class Summary
 | Menu | Command-line interface |
 | Formula | An object representing a chemical formula |
 | FormulaHelper | Reduce unnecessary method load from Formula |
+| Equation | A container for Formula objects that represent a chemical equation |
 
 
 TODO:
