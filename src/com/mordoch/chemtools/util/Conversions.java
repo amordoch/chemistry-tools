@@ -21,7 +21,7 @@ import com.mordoch.chemtools.Main;
 /**
  * This class is used as a conversions library for conversions applicable to chemistry.
  * <p>
- * Conversion types are length, molar, mass, and volume.
+ * Conversions types are length, molar, mass, and volume.
  * </p>
  * <em> All methods are static; this class is abstract. </em>
  * 
@@ -31,7 +31,7 @@ import com.mordoch.chemtools.Main;
  * @since 0.1
  */
 
-public abstract class Conversion extends LookupTable {
+public class Conversions implements Constants {
 
   /*
    * Molar conversions

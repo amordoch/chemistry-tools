@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="javadoc">
-    <target name="javadoc">
-        <javadoc access="package" author="true" classpath="." destdir="doc" doctitle="Chemistry Tools" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="com.mordoch.chemtools,com.mordoch.chemtools.util,com.mordoch.chemtools.interaction" source="1.8" sourcepath="src" splitindex="true" use="true" version="true"/>
-    </target>
-</project>

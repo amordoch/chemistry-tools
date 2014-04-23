@@ -16,14 +16,14 @@
 
 package com.mordoch.chemtools.interaction;
 
-import java.util.List;
 import java.util.Scanner;
 
 import com.mordoch.chemtools.Main;
-import com.mordoch.chemtools.formulatools.FormulaHelper;
+import com.mordoch.chemtools.formulatools.FtHelper;
 import com.mordoch.chemtools.util.Analysis;
-import com.mordoch.chemtools.util.Conversion;
-import com.mordoch.chemtools.util.LookupTable;
+import com.mordoch.chemtools.util.Conversions;
+import com.mordoch.chemtools.util.lists.CombinedList;
+
 
 /**
  * This class contains the command-line menu system.
@@ -36,9 +36,8 @@ import com.mordoch.chemtools.util.LookupTable;
 
 public class Menu {
 
-  private LookupTable lookup = new LookupTable();
-  private FormulaHelper parser = new FormulaHelper(lookup);
-  private Analysis analysis = new Analysis(lookup, parser);
+  private CombinedList comboList = new CombinedList();
+  private Analysis analysis = new Analysis(comboList.mass);
   private Scanner input = new Scanner(System.in);
 
   /**
@@ -73,35 +72,20 @@ public class Menu {
         System.out.println();
         println("Enter an element:");
         String element = input.next();
-        // New List to store element info.
-        List<String> elementInfo = null;
-        // Start looping
-        boolean inputIsValid = false;
-        while (!inputIsValid) {
-          try {
-            // Now try getting element info
-            elementInfo = lookup.getElementInfo(element);
+        try {
+          // Now try getting element info
+          getElementInfo(element);
 
-          } catch (NullPointerException e) {
-            // If user entered a non-existent element, try again and get element info. If the user
-            // enters
-            // a nonexistent element again it will throw a IndexOutOfBounds exception.
-            println("Enter a real element this time:");
-            String anotherElement = input.next();
-            elementInfo = lookup.getElementInfo(anotherElement);
+        } catch (NullPointerException e) {
+          // If user entered a non-existent element, try again and get element info. If the user
+          // enters
+          // a nonexistent element again it will throw a IndexOutOfBounds exception.
+          println("Enter a real element this time:");
+          String anotherElement = input.next();
+          getElementInfo(anotherElement);
 
-          } finally {
-            // Finally, print element info
-            println("Name: " + elementInfo.get(0));
-            println("Type: " + elementInfo.get(1));
-            println("Atomic number: " + elementInfo.get(2));
-            println("Atomic mass: " + elementInfo.get(3) + " amu");
-            println("Molar mass: " + elementInfo.get(4) + " g/mol");
-            // Stop looping
-            inputIsValid = true;
-          }
         }
-        Thread.sleep(2000);
+        Thread.sleep(5000);
         mainMenu();
         break;
 
@@ -111,6 +95,11 @@ public class Menu {
 
       case 99:
         // Debug
+        //System.out.println( analysis.computeMolarMass("Ag1N1O3") );
+        //System.out.print(Stoichiometry.findRatio("Cu + (2)Ag1N1O3 ---> Cu1N2O6 + (2)Ag"));
+        //System.out.println( analysis.computePercentComposition("H2O1") );
+        //println(analysis.empiricalFromMolecular("H2O1").toString());
+        println(FtHelper.parseFormula("C6H12O6").getBondType());
         break;
 
       default:
@@ -176,56 +165,56 @@ public class Menu {
         // Centimeters to meters
         amount();
         double centimeters = input.nextDouble();
-        println(Conversion.centimetersToMeters(centimeters) + " m");
+        println(Conversions.centimetersToMeters(centimeters) + " m");
         break;
 
       case 1:
         // Meters to centimeters
         amount();
         double meters = input.nextDouble();
-        println(Conversion.metersToCentimeters(meters) + " cm");
+        println(Conversions.metersToCentimeters(meters) + " cm");
         break;
 
       case 2:
         // Microns to centimeters
         amount();
         double microns = input.nextDouble();
-        println(Conversion.micronsToCentimeters(microns) + " cm");
+        println(Conversions.micronsToCentimeters(microns) + " cm");
         break;
 
       case 3:
         // Centimeters to microns
         amount();
         double centimeters1 = input.nextDouble();
-        println(Conversion.centimetersToMicrons(centimeters1) + " microns");
+        println(Conversions.centimetersToMicrons(centimeters1) + " microns");
         break;
 
       case 4:
         // Nanometers to microns
         amount();
         double nanometers = input.nextDouble();
-        println(Conversion.nanometersToMicrons(nanometers) + " microns");
+        println(Conversions.nanometersToMicrons(nanometers) + " microns");
         break;
 
       case 5:
         // Microns to nanometers
         amount();
         double microns1 = input.nextDouble();
-        println(Conversion.micronsToNanometers(microns1) + " nm");
+        println(Conversions.micronsToNanometers(microns1) + " nm");
         break;
 
       case 6:
         // Picometers to nanometers
         amount();
         double picometers = input.nextDouble();
-        println(Conversion.picometersToNanometers(picometers) + " nm");
+        println(Conversions.picometersToNanometers(picometers) + " nm");
         break;
 
       case 7:
         // Nanometers to picometers
         amount();
         double nanometers1 = input.nextDouble();
-        println(Conversion.nanometersToPicometers(nanometers1) + " pm");
+        println(Conversions.nanometersToPicometers(nanometers1) + " pm");
         break;
 
       default:
@@ -252,42 +241,42 @@ public class Menu {
         // Grams to milligrams
         amount();
         double grams = input.nextDouble();
-        println(Conversion.gramsToMilligrams(grams) + " mg");
+        println(Conversions.gramsToMilligrams(grams) + " mg");
         break;
 
       case 1:
         // Milligrams to grams
         amount();
         double milligrams = input.nextDouble();
-        println(Conversion.milligramsToGrams(milligrams) + " g");
+        println(Conversions.milligramsToGrams(milligrams) + " g");
         break;
 
       case 2:
         // Grams to kilograms
         amount();
         double grams1 = input.nextDouble();
-        println(Conversion.gramsToKilograms(grams1) + " kg");
+        println(Conversions.gramsToKilograms(grams1) + " kg");
         break;
 
       case 3:
         // Kilograms to grams
         amount();
         double kilograms = input.nextDouble();
-        println(Conversion.kilogramsToGrams(kilograms) + " g");
+        println(Conversions.kilogramsToGrams(kilograms) + " g");
         break;
 
       case 4:
         // amus to grams
         amount();
         double amus = input.nextDouble();
-        println(Conversion.amuToGram(amus) + " g");
+        println(Conversions.amuToGram(amus) + " g");
         break;
 
       case 5:
         // Grams to amus
         amount();
         double grams2 = input.nextDouble();
-        println(Conversion.gramToAmu(grams2) + " amu");
+        println(Conversions.gramToAmu(grams2) + " amu");
 
       default:
         // Go back to conversions menu
@@ -311,28 +300,28 @@ public class Menu {
         // Liters to milliliters
         amount();
         double liters = input.nextDouble();
-        println(Conversion.litersToMilliliters(liters) + " mL");
+        println(Conversions.litersToMilliliters(liters) + " mL");
         break;
 
       case 1:
         // Milliliters to liters
         amount();
         double milliliters = input.nextDouble();
-        println(Conversion.millilitersToLiters(milliliters) + " L");
+        println(Conversions.millilitersToLiters(milliliters) + " L");
         break;
 
       case 2:
         // Liters to kiloliters
         amount();
         double liters1 = input.nextDouble();
-        println(Conversion.litersToKiloliters(liters1) + " kL");
+        println(Conversions.litersToKiloliters(liters1) + " kL");
         break;
 
       case 3:
         // Kiloliters to liters
         amount();
         double kiloliters = input.nextDouble();
-        println(Conversion.kilolitersToLiters(kiloliters) + " L");
+        println(Conversions.kilolitersToLiters(kiloliters) + " L");
         break;
 
       default:
@@ -360,7 +349,7 @@ public class Menu {
         double mass = input.nextDouble();
         println("Enter the molar mass of an element/formula: ");
         double molarMass = input.nextDouble();
-        println(Conversion.massToMols(mass, molarMass) + " mols");
+        println(Conversions.massToMols(mass, molarMass) + " mols");
         break;
 
       case 1:
@@ -369,21 +358,21 @@ public class Menu {
         double mols = input.nextDouble();
         println("Enter the molar mass of an element/formula: ");
         double molarMass1 = input.nextDouble();
-        println(Conversion.molsToMass(mols, molarMass1) + " g");
+        println(Conversions.molsToMass(mols, molarMass1) + " g");
         break;
 
       case 2:
         // mols to atom count
         println("Enter the mols of an element/formula: ");
         double mols1 = input.nextDouble();
-        println(Conversion.molsToAtomCount(mols1) + " atoms");
+        println(Conversions.molsToAtomCount(mols1) + " atoms");
         break;
 
       case 3:
         // atom count to mols
         println("Enter the atom count of an element/formula: ");
         double atomCount = input.nextDouble();
-        println(Conversion.atomCountToMols(atomCount) + " mols");
+        println(Conversions.atomCountToMols(atomCount) + " mols");
         break;
 
       default:
@@ -399,19 +388,14 @@ public class Menu {
   private void analysisMenu() throws InterruptedException {
 
     System.out.println();
-    if (!hasSeenFormulaWarning) {
-      warningMenu(1);
-      hasSeenFormulaWarning = true;
-      Thread.sleep(1000 * 10);
-    }
-    System.out.println();
     println("Choose an option or enter any integer to go back:");
     println("0: Empirical formula using percent composition");
     println("1: Empirical formula using mass composition");
     println("2: Molecular formula from empirical formula");
-    println("3: Molar mass of a formula");
-    println("4: Mass of a formula");
-    println("5: Number of atoms in a formula");
+    println("3: Empirical formula from molecular formula");
+    println("4: Molar mass of a formula");
+    println("5: Mass of a formula");
+    println("6: Number of atoms in a formula");
 
     switch (input.nextInt()) {
 
@@ -428,14 +412,20 @@ public class Menu {
         break;
 
       case 3:
+        empiricalFormulaMolecularMenu();
+        break;
+        
+      case 4:
         molarMassMenu();
         break;
 
-      case 4:
+      
+
+      case 5:
         massMenu();
         break;
 
-      case 5:
+      case 6:
         numAtomsMenu();
         break;
 
@@ -445,6 +435,13 @@ public class Menu {
 
     }
     mainMenu();
+  }
+
+  private void empiricalFormulaMolecularMenu() throws InterruptedException {
+    println("Enter a formula: ");
+    String formula = input.next();
+    println(analysis.empiricalFromMolecular(formula).toString());    
+    Thread.sleep(2);
   }
 
   private void empiricalFormulaPercentMenu() throws InterruptedException {
@@ -462,7 +459,7 @@ public class Menu {
         double percent1 = input.nextDouble();
         println("Enter a percentage for element 2: ");
         double percent2 = input.nextDouble();
-        println(analysis.empiricalFromPercentComposition(percent1, percent2, element1, element2));
+        println(analysis.empiricalFromPercentComposition(percent1, percent2, element1, element2).toString());
         break;
 
       case 3:
@@ -480,7 +477,7 @@ public class Menu {
         println("Etner a percentage for element 3: ");
         double percentThree = input.nextDouble();
         println(analysis.empiricalFromPercentComposition(percentOne, percentTwo, percentThree,
-            elementOne, elementTwo, elementThree));
+            elementOne, elementTwo, elementThree).toString());
         break;
 
       default:
@@ -504,7 +501,7 @@ public class Menu {
         double mass1 = input.nextDouble();
         println("Enter a mass for element 2: ");
         double mass2 = input.nextDouble();
-        println(analysis.empiricalFromMass(mass1, mass2, element1, element2));
+        println(analysis.empiricalFromMass(mass1, mass2, element1, element2).toString());
         break;
 
       case 3:
@@ -522,7 +519,7 @@ public class Menu {
         println("Enter a percentage for element 3: ");
         double massThree = input.nextDouble();
         println(analysis.empiricalFromMass(massOne, massTwo, massThree, elementOne, elementTwo,
-            elementThree));
+            elementThree).toString());
         break;
 
       default:
@@ -538,7 +535,7 @@ public class Menu {
     String formula = input.next();
     println("Enter the molar mass of the molecular formula: ");
     double molarMassCompound = input.nextDouble();
-    String result = analysis.molecularFromEmpirical(formula, molarMassCompound);
+    String result = analysis.molecularFromEmpirical(formula, molarMassCompound).toString();
     System.out.println();
     System.out.println(result);
 
@@ -564,34 +561,7 @@ public class Menu {
     println(analysis.numOfAtoms(formula) + " atoms");
   }
 
-  /* WARNINGS */
-
-  private boolean hasSeenFormulaWarning = false;
-
-  private void warningMenu(int desiredWarning) {
-
-    switch (desiredWarning) {
-    // Formula syntax
-      case 1:
-        println("READ THE FOLLOWING CAREFULLY.");
-        println("This program only understands "
-            + "formulas that are written in a certain syntax. "
-            + "A single syntactic mistake will crash this program, so read the following syntax examples carefully.");
-        println("C6H12O6 remains C6H12O6");
-        println("NaCl remains NaCl");
-        println("CO2 becomes C1O2");
-        println("H2O becomes H2O1");
-        println("2( (NO3)3 ) becomes (2)N3O9 or N6O18 ");
-        println("(2)NaCl remains (2)NaCl");
-        break;
-
-      default:
-        println("There was supposed to be a warning here, but someone forgot to call warningMenu() with a valid int value!");
-    }
-
-  }
-
-  /* SHORTCUT METHODS */
+  /* UTILITY METHODS */
 
   private static void println(String x) {
     System.out.println(x);
@@ -600,5 +570,26 @@ public class Menu {
   private static void amount() {
     System.out.println("Enter an amount: ");
   }
+  
+  public void getElementInfo(String element) {
+    // Name
+    println("Name: " + comboList.name.data.get(element));
+    // Atomic number
+    println("Atomic number: " + comboList.atomicNumber.data.get(element));
+    // Atomic mass
+    println("Atomic mass: " + comboList.mass.data.get(element) + " amu");
+    // Molar mass
+    println("Molar mass: " + comboList.mass.data.get(element) + " g/mol");
+    // Family
+    println("Family: " + comboList.family.data.get(element));
+    // Type
+    String type = comboList.type.data.get(element);
+    if(type == "Hydrogen") {
+      println("Type: Nonmetal");
+    } else {
+      println ("Type: " + type);
+    }
+  }
+  
 
 }

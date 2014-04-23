@@ -18,8 +18,10 @@ package com.mordoch.chemtools.formulatools;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import com.mordoch.chemtools.util.LookupTable;
+import com.mordoch.chemtools.util.lists.MassList;
+import com.mordoch.chemtools.util.lists.TypeList;
 
 /**
  * The sole purpose of this class is to offload excess methods from Formula.
@@ -29,20 +31,13 @@ import com.mordoch.chemtools.util.LookupTable;
  * @since 0.6.8-alpha
  */
 
-public class FormulaHelper {
+public class FtHelper {
 
-  private LookupTable lookup;
+  private static MassList temp = new MassList();
+  private static Map<String, Double> massList = temp.data;
+  private static TypeList temp2 = new TypeList();
+  private static Map<String, String> typeList = temp2.data;
 
-  /**
-   * Since {@link FormulaHelper#parseFormula(String)} uses a LookupTable, pass a LookupTable
-   * reference when creating a FormulaHelper.
-   * 
-   * @param table a LookupTable
-   */
-
-  public FormulaHelper(LookupTable table) {
-    this.lookup = table;
-  }
 
   /**
    * This method takes a string such as "C6H12O6" and adds the elements, subscripts, and
@@ -59,15 +54,13 @@ public class FormulaHelper {
    * @return a Formula object representing formulaToParse
    */
 
-  public Formula parseFormula(String formulaToParse) {
-    // Create a new formula (ignore the constructor argument for now)
-    Formula formula = new Formula("Ionic");
+  public static Formula parseFormula(String formulaToParse) {
     // Convert the string to an array of chars
     char[] asCharArray = formulaToParse.toCharArray();
 
-    /************** COEFFICIENTS **************/
+    /************** COEFFICIENT **************/
     // Starting character for search is '(', ending character is ')'
-    double coefficient = 0;
+    double coefficient = 1;
 
     for (int index = 0; index < asCharArray.length; index++) {
       // Is the element '('? If so, loop through until we find ')'
@@ -89,7 +82,6 @@ public class FormulaHelper {
         coefficient = Double.parseDouble(finalValue);
       }
     }
-    formula.setCoefficient(coefficient);
 
     /************** SUBSCRIPTS **************/
 
@@ -125,7 +117,6 @@ public class FormulaHelper {
         listOfSubscripts.add(Integer.parseInt(finalValue));
       }
     }
-    formula.setSubscripts(listOfSubscripts);
 
     /************** ELEMENTS **************/
 
@@ -148,8 +139,8 @@ public class FormulaHelper {
           // Try getting the molar mass. If it doesn't exist, we know we have a single element, so
           // set isSingleElement to true.
           try {
-            lookup.getMolarMass(Character.toString(asCharArray[index])
-                + Character.toString(asCharArray[index + 1]));
+            String molarMassToGet = Character.toString(asCharArray[index]) + Character.toString(asCharArray[index + 1]); 
+            massList.get(molarMassToGet);
           } catch (NullPointerException e) {
             listOfElements.add(Character.toString(asCharArray[index]));
             isSingleElement = true;
@@ -172,23 +163,18 @@ public class FormulaHelper {
 
       }
     }
-    formula.setElements(listOfElements);
 
     /************** RETURN **************/
 
-    // No need for asCharArray or the rest of the objects anymore, so send them to garbage
-    // collection!
-    asCharArray = null;
-    listOfSubscripts = null;
-    listOfElements = null;
+    Formula parsedFormula = new Formula(listOfElements, listOfSubscripts, coefficient);
     // Return the Formula object
-    return formula;
+    return parsedFormula;
   }
 
   /**
    * Takes an equation in string form, such as "H2 + (.5)O2 ---&gt; H2O1", and returns an Equation
    * object representing that equation. This method splits the reactants and products into
-   * individual formulas using {@link FormulaHelper#parseFormula(String)}, so keep in mind that the
+   * individual formulas using {@link FtHelper#parseFormula(String)}, so keep in mind that the
    * equation's parts must be syntactically compatible with it. <strong>In order for this method
    * function, the reactants and products must be separated by the sequence '---&gt;' exactly.</strong>
    * 
@@ -196,8 +182,8 @@ public class FormulaHelper {
    * @return an Equation object representing the given equation
    */
 
-  public Equation parseEquation(String equationToParse) {
-    Equation parsedEquation = new Equation(Double.NaN);
+  public static Equation parseEquation(String equationToParse) {
+    //Equation parsedEquation = new Equation(Double.NaN);
     // Sample: H2 + (.5)O2 ---> H2O1
     // Split the 2 sides of the equation
     String[] splitEquation = equationToParse.split("--->");
@@ -216,11 +202,37 @@ public class FormulaHelper {
       products.add(parseFormula(product));
     }
     // Build the Equation object and return
-    parsedEquation.setReactants(reactants);
-    parsedEquation.setProducts(products);
-    reactants = null;
-    products = null;
+    Equation parsedEquation = new Equation(reactants, products, Double.NaN);
     return parsedEquation;
+  }
+  
+  public static String determineBondType(Formula formula) {
+    
+    List<String> elements = formula.getElements();
+    List<String> elementTypes = new ArrayList<String>();
+    for (String element : elements) {
+      elementTypes.add(typeList.get(element));
+    }
+    String bondType = null;
+    /* Logic:
+     * If the formula contains hydrogen and is only composed of 2 elements, the bond is a hydrogen bond.
+     * If the formula contains metals and nonmetals, the bond is covalent.
+     * If the formula contains only metals, the bond is metallic.
+     * If the formula contains only nonmetals, the bond is covalent.
+     */
+    if (elementTypes.contains("Hydrogen") && elements.size() == 2) {
+      bondType = "hydrogen";
+      return bondType;
+    }
+    if (elementTypes.contains("Metal") && elementTypes.contains("Nonmetal")) {
+      bondType = "ionic";
+    } else if(elementTypes.contains("Metal") && !elementTypes.contains("Nonmetal")) {
+      bondType = "metallic";
+    } else if(elementTypes.contains("Nonmetal")&& !elementTypes.contains("Metal")) {
+      bondType = "covalent";
+    }
+    return bondType;
+
   }
 
 }

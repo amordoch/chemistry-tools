@@ -16,51 +16,50 @@
 
 package com.mordoch.chemtools.formulatools;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * This class acts as a means of representing chemical formulas as Java objects.
  * 
  * @author Ariel Mordoch
- * @version 1.5.1
+ * @version 1.5.5
  * @since 0.6.5-alpha
  */
 
 public class Formula {
 
   // Formula data
-  private List<String> elements = new ArrayList<String>();
-  private List<Integer> subscripts = new ArrayList<Integer>();
+  private List<String> elements;
+  private List<Integer> subscripts;
   private double coefficient;
-  private String type;
+  private String bondType;
 
   /**
-   * This constructor is used when passing a formula through
-   * {@link FormulaHelper#parseFormula(String)}. Type serves no purpose yet.
-   * 
-   * @param aType the type of a formula ("Ionic", "Covalent", or "Metallic")
+   * Default constructor, creates a Formula representing oxygen in its natural state.
    */
 
-  public Formula(String aType) {
-    this.type = aType;
+  public Formula() {
+    Formula formula = FtHelper.parseFormula("O2");
+    setElements(formula.getElements());
+    setSubscripts(formula.getSubscripts());
+    setCoefficient(formula.getCoefficient());
+    setBondType("covalent");
   }
 
   /**
    * This constructor should be used when creating a Formula object by declaration.
    * 
-   * @param listOfElements a List of type string that contains the elements of the formula
-   * @param listOfSubscripts a List of type Integer that contains the subscripts of each element
+   * @param listOfElements a List of bondType string that contains the elements of the formula
+   * @param listOfSubscripts a List of bondType Integer that contains the subscripts of each element
    * @param coeff the coefficient of the formula
-   * @param type ignore for now
+   * @param bondType ignore for now
    */
 
-  public Formula(List<String> listOfElements, List<Integer> listOfSubscripts, double coeff,
-      String type) {
-    this.type = type;
+  public Formula(List<String> listOfElements, List<Integer> listOfSubscripts, double coeff) {
     this.elements = listOfElements;
     this.subscripts = listOfSubscripts;
     this.coefficient = coeff;
+    setBondType(FtHelper.determineBondType(this));
   }
 
   /**
@@ -97,7 +96,7 @@ public class Formula {
   /**
    * Gets the coefficients of a given formula, provided they are contained within parentheses.
    * 
-   * @return a List of type Double containing the coefficients of the given formula
+   * @return a List of bondType Double containing the coefficients of the given formula
    */
 
   public final double getCoefficient() {
@@ -108,29 +107,21 @@ public class Formula {
   /**
    * Sets the elements of a formula.
    * 
-   * @param listOfElements a List of type String containing the elements of a formula
+   * @param listOfElements a List of bondType String containing the elements of a formula
    */
 
   public final void setElements(List<String> listOfElements) {
-    if (elements.isEmpty()) {
-      for (String element : listOfElements) {
-        elements.add(element);
-      }
-    }
+      elements = listOfElements;
   }
 
   /**
    * Sets the subscripts of a formula.
    * 
-   * @param listOfSubscripts a List of type Integer containing the subscripts of a formula
+   * @param listOfSubscripts a List of bondType Integer containing the subscripts of a formula
    */
 
   public final void setSubscripts(List<Integer> listOfSubscripts) {
-    if (subscripts.isEmpty()) {
-      for (int subscript : listOfSubscripts) {
-        subscripts.add(subscript);
-      }
-    }
+      subscripts = listOfSubscripts;
   }
 
   /**
@@ -148,12 +139,30 @@ public class Formula {
     }
   }
 
-  public final String getType() {
-    return type;
+  public final String getBondType() {
+    return bondType;
   }
-
-  public final String original() {
-    String originalFormula = "(" + coefficient + ")";
+  
+  public final void setBondType(String validBondType) {
+    validBondType.toLowerCase();
+    if (validBondType == "covalent" || validBondType == "ionic" || validBondType == "metallic" || validBondType == "hydrogen") {
+      bondType = validBondType;
+    }
+  }
+  
+  /**
+   * Returns the string representation of the represented formula.
+   * For example, this method would return "C6H12O6" for a Formula object that
+   * represents glucose.
+   */
+  @Override
+  public final String toString() {
+    String originalFormula;
+    if (coefficient == 1) {
+      originalFormula = "";
+    } else {
+      originalFormula = "(" + coefficient + ")";
+    }
     int indexOfSubscripts = 0;
     for (String element : elements) {
       originalFormula += element + subscripts.get(indexOfSubscripts);

@@ -18,11 +18,13 @@ package com.mordoch.chemtools.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.mordoch.chemtools.Main;
 import com.mordoch.chemtools.formulatools.Equation;
 import com.mordoch.chemtools.formulatools.Formula;
-import com.mordoch.chemtools.formulatools.FormulaHelper;
+import com.mordoch.chemtools.formulatools.FtHelper;
+import com.mordoch.chemtools.util.lists.MassList;
 
 /**
  * This class contains tools for analysis, i.e. finding empirical formula given percent composition.
@@ -35,12 +37,10 @@ import com.mordoch.chemtools.formulatools.FormulaHelper;
 
 public class Analysis {
 
-  private LookupTable lookup;
-  private FormulaHelper formulaParser;
-
-  public Analysis(LookupTable aLookupTable, FormulaHelper aFormulaHelper) {
-    this.lookup = aLookupTable;
-    this.formulaParser = aFormulaHelper;
+  private Map<String, Double> massList;
+  
+  public Analysis(MassList aMassList) {
+    this.massList = aMassList.data;
   }
 
   /**
@@ -63,20 +63,28 @@ public class Analysis {
    * @since 0.1
    */
 
-  public String empiricalFromPercentComposition(double percent1, double percent2, double percent3,
+  public Formula empiricalFromPercentComposition(double percent1, double percent2, double percent3,
       String element1, String element2, String element3) {
     // First find the mols of each element then find which one is smallest.
-    double element1Mols = percent1 / lookup.getMolarMass(element1);
-    double element2Mols = percent2 / lookup.getMolarMass(element2);
-    double element3Mols = percent3 / lookup.getMolarMass(element3);
+    double element1Mols = percent1 / massList.get(element1);
+    double element2Mols = percent2 / massList.get(element2);
+    double element3Mols = percent3 / massList.get(element3);
     double normalize = Math.min(element1Mols, Math.min(element2Mols, element3Mols));
     // Now normalize the formula.
     double element1Normal = element1Mols / normalize;
     double element2Normal = element2Mols / normalize;
     double element3Normal = element3Mols / normalize;
-    // Now return the completed formula.
-    return element1 + "(" + element1Normal + ")" + element2 + "(" + element2Normal + ")" + element3
-        + "(" + element3Normal + ")";
+    // Now construct and return the completed formula.
+    List<String> elements = new ArrayList<String>();
+    elements.add(element1);
+    elements.add(element2);
+    elements.add(element3);
+    List<Integer> subscripts = new ArrayList<Integer>();
+    subscripts.add((int) Math.round(element1Normal));
+    subscripts.add((int) Math.round(element2Normal));
+    subscripts.add((int) Math.round(element3Normal));
+    Formula empiricalFormula = new Formula(elements, subscripts, 1);
+    return empiricalFormula;
   }
 
   /**
@@ -97,17 +105,24 @@ public class Analysis {
    * @since 0.2
    */
 
-  public String empiricalFromPercentComposition(double percent1, double percent2, String element1,
+  public Formula empiricalFromPercentComposition(double percent1, double percent2, String element1,
       String element2) {
     // First find the mols of each element then find which one is smallest.
-    double element1Mols = percent1 / lookup.getMolarMass(element1);
-    double element2Mols = percent2 / lookup.getMolarMass(element2);
+    double element1Mols = percent1 / massList.get(element1);
+    double element2Mols = percent2 / massList.get(element2);
     double normalize = Math.min(element1Mols, element2Mols);
     // Now normalize the formula.
-    double element1Normal = element1Mols / normalize;
-    double element2Normal = element2Mols / normalize;
-    // Now return the completed formula.
-    return element1 + "(" + element1Normal + ")" + element2 + "(" + element2Normal + ")";
+    final double element1Normal = element1Mols / normalize;
+    final double element2Normal = element2Mols / normalize;
+    // Now construct the formula and return.
+    List<Integer> subscripts = new ArrayList<Integer>();
+    subscripts.add((int) Math.round(element1Normal));
+    subscripts.add((int) Math.round(element2Normal));
+    List<String> elements = new ArrayList<String>();
+    elements.add(element1);
+    elements.add(element2);
+    Formula empiricalFormula = new Formula(elements, subscripts, 1.0);
+    return empiricalFormula;
   }
 
   /**
@@ -130,12 +145,12 @@ public class Analysis {
    * @since 0.2
    */
 
-  public String empiricalFromMass(double mass1, double mass2, double mass3, String element1,
+  public Formula empiricalFromMass(double mass1, double mass2, double mass3, String element1,
       String element2, String element3) {
     // First find the percent composition
-    double element1Percent = mass1 / lookup.getMolarMass(element1);
-    double element2Percent = mass2 / lookup.getMolarMass(element2);
-    double element3Percent = mass3 / lookup.getMolarMass(element3);
+    double element1Percent = mass1 / massList.get(element1);
+    double element2Percent = mass2 / massList.get(element2);
+    double element3Percent = mass3 / massList.get(element3);
     // Now find empirical formula (there's already a method for this, so why not use it?).
     return empiricalFromPercentComposition(element1Percent, element2Percent, element3Percent,
         element1, element2, element3);
@@ -159,10 +174,10 @@ public class Analysis {
    * @since 0.2
    */
 
-  public String empiricalFromMass(double mass1, double mass2, String element1, String element2) {
+  public Formula empiricalFromMass(double mass1, double mass2, String element1, String element2) {
     // First find the percent composition
-    double element1Percent = mass1 / lookup.getMolarMass(element1);
-    double element2Percent = mass2 / lookup.getMolarMass(element2);
+    double element1Percent = mass1 / massList.get(element1);
+    double element2Percent = mass2 / massList.get(element2);
     // Now find empirical formula
     return empiricalFromPercentComposition(element1Percent, element2Percent, element1, element2);
   }
@@ -175,12 +190,12 @@ public class Analysis {
    * @param empiricalFormula a chemical formula syntactically compatible with
    *        Parser#parseSimpleFormula
    * @param molarMassCompound the molar mass of a compound
-   * @return an List of type Integer containing the molecular formula's subscripts
+   * @return a Formula representing the molecular formula
    * @since 0.3
    */
 
-  public final String molecularFromEmpirical(String empiricalFormula, double molarMassCompound) {
-    Formula parsedFormula = formulaParser.parseFormula(empiricalFormula);
+  public final Formula molecularFromEmpirical(String empiricalFormula, double molarMassCompound) {
+    Formula parsedFormula = FtHelper.parseFormula(empiricalFormula);
     // Get the molar mass and subscripts of the empirical formula
     double molarMassEmpirical = computeMolarMass(empiricalFormula);
     List<Integer> subscripts = parsedFormula.getSubscripts();
@@ -199,22 +214,71 @@ public class Analysis {
     }
     List<String> elements = parsedFormula.getElements();
     // Construct the molecular formula
-    String molecularFormula = "";
-    int indexOfSubscripts = 0;
-    for (String element : elements) {
-      molecularFormula += element + roundedSubscripts.get(indexOfSubscripts);
-      indexOfSubscripts++;
-    }
-    // Discard objects and return
-    newSubscripts = null;
-    subscripts = null;
-    roundedSubscripts = null;
-    parsedFormula = null;
+    Formula molecularFormula = new Formula(elements, roundedSubscripts, parsedFormula.getCoefficient());
     return molecularFormula;
   }
+  
+  /**
+   * This method finds the empirical formula from a given molecular formula, using 
+   * GCD. <strong>Note that the method used to find GCD, which is based off
+   * Euclid's algorithm, can err.</strong>
+   * 
+   * @param formula a molecular formula
+   * @return the empirical formula, in the form of a Formula object
+   */
+  
+  public final Formula empiricalFromMolecular(String formula) {
+    int gcd = Integer.MAX_VALUE;
+    Formula empiricalFormula = FtHelper.parseFormula(formula);
+    List<Integer> subscripts = empiricalFormula.getSubscripts();
+    // We'll find GCDs in pairs and store them in tryGCD
+    int[] tryGcd = new int[10];
+    for(int x = 0; x < subscripts.size() - 1; x++) {
+      // First find the initial min and max of the pair.
+      int min = Math.min(subscripts.get(x), subscripts.get(x + 1));
+      int max = Math.max(subscripts.get(x), subscripts.get(x + 1));
+      // Now loop and use the algorithm.
+      for (int y = 0; y < 1000; y++) {
+        max -= min;
+        min = Math.min(max, min);
+        max = Math.max(max, min);
+        if (max == min) {
+          tryGcd[x] = min;
+          break;
+        }
+      }
+    }
+    // Loop through tryGCD, find the smallest GCD that isn't 0, and set GCD to it.
+    for (int candidateGcd : tryGcd ) {
+      if (candidateGcd != 0) {
+        if (candidateGcd < gcd) {
+          gcd = candidateGcd;
+        }
+      }
+    }
+    // Now that we finally have the GCD, divide the subscripts by it 
+    // and return the empirical formula.
+    List<Integer> newSubscripts = new ArrayList<Integer>();
+    for (int subscript : subscripts) {
+      newSubscripts.add(subscript / gcd);
+    }
+    empiricalFormula.setSubscripts(newSubscripts);
+    return empiricalFormula;
+  }
+  
 
-  public double[] computePercentComposition(String formula) {
-    return null;
+  public List<Double> computePercentComposition(String formula) {
+
+    List<Double> percents = new ArrayList<Double>();
+    Formula parsedFormula = FtHelper.parseFormula(formula);
+    List<Integer> subscripts = parsedFormula.getSubscripts();
+    List<String> elements = parsedFormula.getElements();
+    double molarMass = computeMolarMass(formula);
+    for(int index = 0; index < elements.size(); index++) {
+      percents.add( ( (subscripts.get(index) * 
+          massList.get(elements.get(index))) / molarMass ) * 100);
+    }
+    return percents;
   }
 
   public double[] computeMassComposition(String formula, double mass) {
@@ -229,7 +293,7 @@ public class Analysis {
    */
 
   public double computeMolarMass(String formula) {
-    Formula parsedFormula = formulaParser.parseFormula(formula);
+    Formula parsedFormula = FtHelper.parseFormula(formula);
     // First get the subscripts, elements, and coefficients from the forumula and declare a variable
     // that stores molar mass.
     List<Integer> subscripts = parsedFormula.getSubscripts();
@@ -240,7 +304,7 @@ public class Analysis {
     // Note that the given formula must be syntactically compatible with
     // Parser#parseFormula().
     for (int index = 0; index < elements.size(); index++) {
-      molarMass += subscripts.get(index) * lookup.getMolarMass(elements.get(index));
+      molarMass += subscripts.get(index) * massList.get(elements.get(index));
     }
     // Now discard all the objects and return.
     parsedFormula = null;
@@ -261,7 +325,7 @@ public class Analysis {
     // First get the molar mass of the formula.
     double molarMass = computeMolarMass(formula);
     // Now find mass.
-    return Conversion.molsToMass(moles, molarMass);
+    return Conversions.molsToMass(moles, molarMass);
   }
 
   /**
@@ -273,7 +337,7 @@ public class Analysis {
 
   public int numOfAtoms(String formula) {
     int numAtoms = 0;
-    Formula parsedFormula = formulaParser.parseFormula(formula);
+    Formula parsedFormula = FtHelper.parseFormula(formula);
     for (int subscript : parsedFormula.getSubscripts()) {
       numAtoms += subscript * parsedFormula.getCoefficient();
     }
@@ -291,10 +355,10 @@ public class Analysis {
 
   public int numOfAtomsReactants(String equation) {
     int numAtoms = 0;
-    Equation parsedEquation = formulaParser.parseEquation(equation);
+    Equation parsedEquation = FtHelper.parseEquation(equation);
     List<Formula> reactants = parsedEquation.getReactants();
     for (Formula reactant : reactants) {
-      numAtoms += numOfAtoms(reactant.original());
+      numAtoms += numOfAtoms(reactant.toString());
     }
     parsedEquation = null;
     reactants = null;
@@ -311,10 +375,10 @@ public class Analysis {
   
   public int numOfAtomsProducts(String equation) {
     int numAtoms = 0;
-    Equation parsedEquation = formulaParser.parseEquation(equation);
+    Equation parsedEquation = FtHelper.parseEquation(equation);
     List<Formula> products = parsedEquation.getProducts();
     for (Formula product : products) {
-      numAtoms += numOfAtoms(product.original());
+      numAtoms += numOfAtoms(product.toString());
     }
     parsedEquation = null;
     products = null;

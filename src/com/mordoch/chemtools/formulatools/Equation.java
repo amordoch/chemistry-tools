@@ -16,13 +16,12 @@
 
 package com.mordoch.chemtools.formulatools;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class acts a container for Formula objects that represent a chemical equation. Currently
- * supports up to 2 reactants and 2 products (theoretically, it could support as many reactants and
- * products as the JVM can handle, but for now, 2 of each is fine).
+ * This class acts a container for Formula objects that represent a chemical equation. 
+ * Theoretically, this class can hold as many Formula objects as there is address space, 
+ * so I've set the limit to 10 reactants and products.
  * 
  * @author Ariel Mordoch
  * @version 1.0
@@ -31,20 +30,20 @@ import java.util.List;
 
 public class Equation {
 
-  private Formula reactant1;
-  private Formula reactant2;
-  private Formula product1;
-  private Formula product2;
+  private List<Formula> reactants;
+  private List<Formula> products;
   private double ACTIVATION_ENERGY;
+  
 
   /**
-   * This constuctor is used with {@link FormulaHelper#parseEquation(String)}.
-   * 
-   * @param activation_energy doesn't matter yet
+   * Default constructor, constructs and equation representing photosynthesis.
    */
 
-  public Equation(double activation_energy) {
-    ACTIVATION_ENERGY = activation_energy;
+  public Equation() {
+    Equation eq = FtHelper.parseEquation("(6)C1O2 + (6) H2O1 ---> C6H12O6 + (6)O2");
+    setReactants(eq.getReactants());
+    setProducts(eq.getProducts());
+    setActivationEnergy(eq.getActivationEnergy());
   }
 
   /**
@@ -72,10 +71,7 @@ public class Equation {
    */
 
   public List<Formula> getReactants() {
-    List<Formula> allReactants = new ArrayList<Formula>();
-    allReactants.add(reactant1);
-    allReactants.add(reactant2);
-    return allReactants;
+    return reactants;
   }
 
   /**
@@ -85,10 +81,7 @@ public class Equation {
    */
 
   public List<Formula> getProducts() {
-    List<Formula> allProducts = new ArrayList<Formula>();
-    allProducts.add(product1);
-    allProducts.add(product2);
-    return allProducts;
+    return products;
   }
 
   public double getActivationEnergy() {
@@ -102,8 +95,7 @@ public class Equation {
    */
 
   public final void setReactants(List<Formula> listOfReactants) {
-    reactant1 = listOfReactants.get(0);
-    reactant2 = listOfReactants.get(1);
+    reactants = listOfReactants;
   }
 
   /**
@@ -113,12 +105,8 @@ public class Equation {
    */
 
   public final void setProducts(List<Formula> listOfProducts) {
-    if (listOfProducts.size() == 1) {
-      product1 = listOfProducts.get(0);
-    } else {
-      product1 = listOfProducts.get(0);
-      product2 = listOfProducts.get(1);
-    }
+    products = listOfProducts;
+    saveTheHeap();
   }
 
 
@@ -134,16 +122,19 @@ public class Equation {
 
   public final String original() {
     String originalEq = "";
-    if (product2 == null) {
-      originalEq +=
-          reactant1.original() + " " + "+" + " " + reactant2.original() + " " + "--->" + " "
-              + product1.original();
-    } else {
-      originalEq +=
-          reactant1.original() + " " + "+" + " " + reactant2.original() + " " + "--->" + " "
-              + product1.original() + " " + product2.original();
+    for (Formula formula : reactants) {
+      originalEq += formula.toString();
+    }
+    for (Formula formula : products) {
+      originalEq += formula.toString();
     }
     return originalEq;
+  }
+  
+  private final void saveTheHeap() throws UnsupportedOperationException {
+    if ( reactants.size() + products.size() > 10 ) {
+      throw new UnsupportedOperationException("Equation size exceeds limit");
+    }
   }
 
 }
