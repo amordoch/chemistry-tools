@@ -28,3 +28,4 @@ Class Summary
 | Equation | A container for Formula objects that represent a chemical equation |
 | ElementInfoWrapper | A wrapper for Map&lt;K, V&gt; objects that store element information |
 | Subclasses of ElementInfoWrapper | Implementation of ElementInfoWrapper |
+| Stoichiometry | Stoichiometric computations |

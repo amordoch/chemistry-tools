@@ -20,8 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.mordoch.chemtools.util.lists.MassList;
-import com.mordoch.chemtools.util.lists.TypeList;
+import com.mordoch.chemtools.util.elementinfo.ElementInfo;
 
 /**
  * The sole purpose of this class is to offload excess methods from Formula.
@@ -33,10 +32,8 @@ import com.mordoch.chemtools.util.lists.TypeList;
 
 public class FtHelper {
 
-  private static MassList temp = new MassList();
-  private static Map<String, Double> massList = temp.data;
-  private static TypeList temp2 = new TypeList();
-  private static Map<String, String> typeList = temp2.data;
+  private static Map<String, Double> massList = ElementInfo.mass.unwrap();
+  private static Map<String, String> typeList = ElementInfo.type.unwrap();
 
 
   /**
@@ -206,6 +203,20 @@ public class FtHelper {
     return parsedEquation;
   }
   
+  /**
+   * Determines the bond type of a formula by evaluating what types of elements
+   * make up that formula. This following the logic employed:
+   * <ul>
+   *    <li>If the formula contains hydrogen and is only composed of 2 elements, the bond is a hydrogen bond.</li>
+   *    <li>If the formula contains metals and nonmetals, the bond is covalent.</li>
+   *    <li>If the formula contains only metals, the bond is metallic.</li>
+   *    <li>If the formula contains only nonmetals, the bond is covalent.</li>
+   * </ul>
+   * 
+   * @param formula the formula for which to determine the bond type
+   * @return the bond type, as a String
+   */
+  
   public static String determineBondType(Formula formula) {
     
     List<String> elements = formula.getElements();
@@ -214,13 +225,7 @@ public class FtHelper {
       elementTypes.add(typeList.get(element));
     }
     String bondType = null;
-    /* Logic:
-     * If the formula contains hydrogen and is only composed of 2 elements, the bond is a hydrogen bond.
-     * If the formula contains metals and nonmetals, the bond is covalent.
-     * If the formula contains only metals, the bond is metallic.
-     * If the formula contains only nonmetals, the bond is covalent.
-     */
-    if (elementTypes.contains("Hydrogen") && elements.size() == 2) {
+    if (elementTypes.contains("Hydrogen") && elements.size() <= 2) {
       bondType = "hydrogen";
       return bondType;
     }

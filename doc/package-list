@@ -2,3 +2,4 @@ com.mordoch.chemtools
 com.mordoch.chemtools.formulatools
 com.mordoch.chemtools.interaction
 com.mordoch.chemtools.util
+com.mordoch.chemtools.util.elementinfo

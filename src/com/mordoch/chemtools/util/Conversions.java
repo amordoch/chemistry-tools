@@ -23,7 +23,6 @@ import com.mordoch.chemtools.Main;
  * <p>
  * Conversions types are length, molar, mass, and volume.
  * </p>
- * <em> All methods are static; this class is abstract. </em>
  * 
  * @author Ariel Mordoch
  * @version 1.1
@@ -31,7 +30,10 @@ import com.mordoch.chemtools.Main;
  * @since 0.1
  */
 
-public class Conversions implements Constants {
+public class Conversions {
+  
+  private static final double AVOGADROS_NUMBER = Constants.AVOGADROS_NUMBER;
+  private static final double ATOMIC_MASS_UNIT_GM = Constants.ATOMIC_MASS_UNIT_GM;
 
   /*
    * Molar conversions

@@ -28,7 +28,7 @@ import com.mordoch.chemtools.interaction.Menu;
 
 public class Main {
 
-  public static final String PROGRAM_VERSION = "0.7-alpha";
+  public static final String PROGRAM_VERSION = "0.8-alpha";
 
   /**
    * The main method prints out copyright information then instantiates Menu and calls mainMenu();

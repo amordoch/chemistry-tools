@@ -40,37 +40,39 @@ public class Formula {
 
   public Formula() {
     Formula formula = FtHelper.parseFormula("O2");
-    setElements(formula.getElements());
-    setSubscripts(formula.getSubscripts());
-    setCoefficient(formula.getCoefficient());
-    setBondType("covalent");
+    elements = formula.getElements();
+    subscripts = formula.getSubscripts();
+    coefficient = formula.getCoefficient();
+    bondType = "covalent";
   }
 
   /**
-   * This constructor should be used when creating a Formula object by declaration.
+   * This constructor should be used when creating a Formula object by declaration. It will
+   * call {@link FtHelper#determineBondType(Formula)} on itself to set the bond type.
    * 
    * @param listOfElements a List of bondType string that contains the elements of the formula
    * @param listOfSubscripts a List of bondType Integer that contains the subscripts of each element
    * @param coeff the coefficient of the formula
-   * @param bondType ignore for now
    */
 
   public Formula(List<String> listOfElements, List<Integer> listOfSubscripts, double coeff) {
-    this.elements = listOfElements;
-    this.subscripts = listOfSubscripts;
-    this.coefficient = coeff;
-    setBondType(FtHelper.determineBondType(this));
+    elements = listOfElements;
+    subscripts = listOfSubscripts;
+    coefficient = coeff;
+    bondType = FtHelper.determineBondType(this).toLowerCase();
   }
 
   /**
    * Gets the elements of a formula.
    * 
-   * @return the elements of a formula (in the above example, it would return ["C", "H", "O"])
+   * @return the elements of a formula (e.g. ["C", "H", "O"])
    */
 
   public final List<String> getElements() {
-    if (elements.isEmpty()) {
-      elements = null;
+    try {
+      elements.get(0);
+    } catch (NullPointerException e) {
+      throw new RuntimeException("Formula does not contain elements, confusion ensued");
     }
     return elements;
   }
@@ -78,15 +80,14 @@ public class Formula {
   /**
    * Gets the subscripts of each element in a formula.
    * 
-   * @return the subscripts of each element in that formula (in the above case, it would return [6,
+   * @return the subscripts of each element in that formula (e.g. [6,
    *         12, 6])
    */
 
-  @SuppressWarnings("unused")
   public final List<Integer> getSubscripts() {
     // If subscripts is empty, add 1's corresponding to the amount of elements in the formula
     if (subscripts.isEmpty()) {
-      for (String element : elements) {
+      for (int i = 0; i < elements.size(); i++) {
         subscripts.add(1);
       }
     }
@@ -94,9 +95,9 @@ public class Formula {
   }
 
   /**
-   * Gets the coefficients of a given formula, provided they are contained within parentheses.
+   * Gets the coefficient of a given formula.
    * 
-   * @return a List of bondType Double containing the coefficients of the given formula
+   * @return the coefficient
    */
 
   public final double getCoefficient() {
@@ -125,29 +126,27 @@ public class Formula {
   }
 
   /**
-   * Sets the coefficients of a formula. If a formula contains no subscripts, an array of a length
-   * corresponding to the amount of elements and filled with 1's is fine.
+   * Sets the coefficient of a formula. Coefficients less than 1 are not possible
+   * and thus the coefficient is simply set to 1. 
    * 
    * @param aCoefficient the coefficient of the formula
    */
 
   public final void setCoefficient(double aCoefficient) {
-    if (aCoefficient == 0) {
+    if (aCoefficient < 1) {
       coefficient = 1;
     } else {
       coefficient = aCoefficient;
     }
   }
 
+  /**
+   * Returns the bond type of the formula.
+   * 
+   * @return the bond type of the current instance
+   */
   public final String getBondType() {
     return bondType;
-  }
-  
-  public final void setBondType(String validBondType) {
-    validBondType.toLowerCase();
-    if (validBondType == "covalent" || validBondType == "ionic" || validBondType == "metallic" || validBondType == "hydrogen") {
-      bondType = validBondType;
-    }
   }
   
   /**
@@ -155,6 +154,7 @@ public class Formula {
    * For example, this method would return "C6H12O6" for a Formula object that
    * represents glucose.
    */
+  
   @Override
   public final String toString() {
     String originalFormula;

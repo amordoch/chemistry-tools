@@ -19,10 +19,9 @@ package com.mordoch.chemtools.interaction;
 import java.util.Scanner;
 
 import com.mordoch.chemtools.Main;
-import com.mordoch.chemtools.formulatools.FtHelper;
 import com.mordoch.chemtools.util.Analysis;
 import com.mordoch.chemtools.util.Conversions;
-import com.mordoch.chemtools.util.lists.CombinedList;
+import com.mordoch.chemtools.util.elementinfo.ElementInfo;
 
 
 /**
@@ -36,8 +35,6 @@ import com.mordoch.chemtools.util.lists.CombinedList;
 
 public class Menu {
 
-  private CombinedList comboList = new CombinedList();
-  private Analysis analysis = new Analysis(comboList.mass);
   private Scanner input = new Scanner(System.in);
 
   /**
@@ -95,11 +92,8 @@ public class Menu {
 
       case 99:
         // Debug
-        //System.out.println( analysis.computeMolarMass("Ag1N1O3") );
-        //System.out.print(Stoichiometry.findRatio("Cu + (2)Ag1N1O3 ---> Cu1N2O6 + (2)Ag"));
-        //System.out.println( analysis.computePercentComposition("H2O1") );
-        //println(analysis.empiricalFromMolecular("H2O1").toString());
-        println(FtHelper.parseFormula("C6H12O6").getBondType());
+        // System.out.println(Stoichiometry.theoreticalYield("Na2S1 + (2)Ag1N1O3 ---> Ag2S1 + (2)Na1N1O3",
+        // 3.94, 2, 1))
         break;
 
       default:
@@ -414,12 +408,12 @@ public class Menu {
       case 3:
         empiricalFormulaMolecularMenu();
         break;
-        
+
       case 4:
         molarMassMenu();
         break;
 
-      
+
 
       case 5:
         massMenu();
@@ -440,7 +434,7 @@ public class Menu {
   private void empiricalFormulaMolecularMenu() throws InterruptedException {
     println("Enter a formula: ");
     String formula = input.next();
-    println(analysis.empiricalFromMolecular(formula).toString());    
+    println(Analysis.empiricalFromMolecular(formula).toString());
     Thread.sleep(2);
   }
 
@@ -459,7 +453,8 @@ public class Menu {
         double percent1 = input.nextDouble();
         println("Enter a percentage for element 2: ");
         double percent2 = input.nextDouble();
-        println(analysis.empiricalFromPercentComposition(percent1, percent2, element1, element2).toString());
+        println(Analysis.empiricalFromPercentComposition(percent1, percent2, element1, element2)
+            .toString());
         break;
 
       case 3:
@@ -476,7 +471,7 @@ public class Menu {
         double percentTwo = input.nextDouble();
         println("Etner a percentage for element 3: ");
         double percentThree = input.nextDouble();
-        println(analysis.empiricalFromPercentComposition(percentOne, percentTwo, percentThree,
+        println(Analysis.empiricalFromPercentComposition(percentOne, percentTwo, percentThree,
             elementOne, elementTwo, elementThree).toString());
         break;
 
@@ -501,7 +496,7 @@ public class Menu {
         double mass1 = input.nextDouble();
         println("Enter a mass for element 2: ");
         double mass2 = input.nextDouble();
-        println(analysis.empiricalFromMass(mass1, mass2, element1, element2).toString());
+        println(Analysis.empiricalFromMass(mass1, mass2, element1, element2).toString());
         break;
 
       case 3:
@@ -518,7 +513,7 @@ public class Menu {
         double massTwo = input.nextDouble();
         println("Enter a percentage for element 3: ");
         double massThree = input.nextDouble();
-        println(analysis.empiricalFromMass(massOne, massTwo, massThree, elementOne, elementTwo,
+        println(Analysis.empiricalFromMass(massOne, massTwo, massThree, elementOne, elementTwo,
             elementThree).toString());
         break;
 
@@ -535,7 +530,7 @@ public class Menu {
     String formula = input.next();
     println("Enter the molar mass of the molecular formula: ");
     double molarMassCompound = input.nextDouble();
-    String result = analysis.molecularFromEmpirical(formula, molarMassCompound).toString();
+    String result = Analysis.molecularFromEmpirical(formula, molarMassCompound).toString();
     System.out.println();
     System.out.println(result);
 
@@ -544,7 +539,7 @@ public class Menu {
   private void molarMassMenu() {
     println("Enter a formula: ");
     String formula = input.next();
-    println(analysis.computeMolarMass(formula) + " g/mol");
+    println(Analysis.computeMolarMass(formula) + " g/mol");
   }
 
   private void massMenu() {
@@ -552,13 +547,13 @@ public class Menu {
     String formula = input.next();
     println("Enter the moles of that formula: ");
     double moles = input.nextDouble();
-    println(analysis.computeMass(formula, moles) + " g");
+    println(Analysis.computeMass(formula, moles) + " g");
   }
 
   private void numAtomsMenu() {
     println("Enter a formula: ");
     String formula = input.next();
-    println(analysis.numOfAtoms(formula) + " atoms");
+    println(Analysis.numOfAtoms(formula) + " atoms");
   }
 
   /* UTILITY METHODS */
@@ -570,26 +565,26 @@ public class Menu {
   private static void amount() {
     System.out.println("Enter an amount: ");
   }
-  
+
   public void getElementInfo(String element) {
     // Name
-    println("Name: " + comboList.name.data.get(element));
+    println("Name: " + ElementInfo.name.get(element));
     // Atomic number
-    println("Atomic number: " + comboList.atomicNumber.data.get(element));
+    println("Atomic number: " + ElementInfo.atomicNumber.get(element));
     // Atomic mass
-    println("Atomic mass: " + comboList.mass.data.get(element) + " amu");
+    println("Atomic mass: " + ElementInfo.mass.get(element) + " amu");
     // Molar mass
-    println("Molar mass: " + comboList.mass.data.get(element) + " g/mol");
+    println("Molar mass: " + ElementInfo.mass.get(element) + " g/mol");
     // Family
-    println("Family: " + comboList.family.data.get(element));
+    println("Family: " + ElementInfo.family.get(element));
     // Type
-    String type = comboList.type.data.get(element);
-    if(type == "Hydrogen") {
+    String type = ElementInfo.type.get(element);
+    if (type == "Hydrogen") {
       println("Type: Nonmetal");
     } else {
-      println ("Type: " + type);
+      println("Type: " + type);
     }
   }
-  
+
 
 }
